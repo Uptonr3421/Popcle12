@@ -153,20 +153,11 @@
   }
 
   .gradient-warm {
-    @apply bg-gradient-to-br from-accent via-[#FFD93D] to-orange-400;
+    background: linear-gradient(to bottom right, var(--accent), #FFD93D, #f97316);
   }
 
   .gradient-burgundy-coral {
-    @apply bg-gradient-to-r from-primary via-accent to-orange-500;
-  }
-
-  /* Geofence status indicators */
-  .geofence-active {
-    @apply ring-2 ring-secondary shadow-lg shadow-secondary/50 animate-glow;
-  }
-
-  .geofence-inactive {
-    @apply ring-2 ring-muted opacity-60;
+    background: linear-gradient(to right, var(--primary), var(--accent), #f97316);
   }
 
   /* Stamp animations */
@@ -212,6 +203,16 @@
 
   .animate-glow {
     animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  /* Geofence status indicators - must come after keyframes */
+  .geofence-active {
+    @apply ring-2 ring-secondary shadow-lg shadow-secondary/50;
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  .geofence-inactive {
+    @apply ring-2 ring-muted opacity-60;
   }
 
   @keyframes bounce-float {
@@ -369,16 +370,17 @@
   }
 
   .btn-accent-glow {
-    @apply btn-vibrant bg-gradient-to-r from-accent to-orange-500 text-accent-foreground hover:shadow-lg hover:shadow-accent/50;
+    @apply btn-vibrant text-accent-foreground hover:shadow-lg hover:shadow-accent/50;
+    background: linear-gradient(to right, var(--accent), #f97316);
   }
 
   .btn-secondary-glow {
-    @apply btn-vibrant bg-gradient-to-r from-secondary to-teal-500 text-secondary-foreground hover:shadow-lg hover:shadow-secondary/50;
+    @apply btn-vibrant bg-gradient-to-r from-secondary to-accent text-secondary-foreground hover:shadow-lg hover:shadow-secondary/50;
   }
 
   /* Card enhancement */
   .card-vibrant {
-    @apply rounded-2xl border border-border shadow-md transition-all hover:shadow-lg hover:scale-102;
+    @apply rounded-2xl border border-border shadow-md transition-all hover:shadow-lg;
   }
 
   /* Heading styles with Poppins */

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import QRCode from 'qrcode.react';
+import { QRCodeCanvas } from 'qrcode.react';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -138,7 +138,7 @@ export default function DashboardPage() {
 
           {/* Geofence Alert */}
           {nearStore && (
-            <section className="card-vibrant bg-gradient-to-r from-secondary/20 via-teal-100/30 to-transparent p-6 border-2 border-secondary/50 animate-glow">
+            <section className="card-vibrant bg-gradient-to-r from-secondary/20 via-accent/20 to-transparent p-6 border-2 border-secondary/50 geofence-active">
               <p className="font-semibold text-secondary text-lg text-center flex items-center justify-center gap-2">
                 <span className="text-2xl animate-bounce">📍</span>
                 You're near Pop Culture CLE! Check offers and special deals!
@@ -198,8 +198,8 @@ export default function DashboardPage() {
               {/* Status Message */}
               <div className="mb-8">
                 {isReady ? (
-                  <div className="inline-block px-6 py-3 bg-gradient-to-r from-secondary to-teal-500 text-white rounded-full font-bold text-lg animate-bounce-in shadow-lg">
-                    🎉 Ready for Free Item!
+                  <div className="inline-block px-6 py-3 bg-gradient-to-r from-secondary to-accent text-white rounded-full font-bold text-lg animate-bounce-in shadow-lg">
+                    Ready for Free Item!
                   </div>
                 ) : (
                   <p className="text-2xl font-semibold text-foreground">
@@ -215,7 +215,7 @@ export default function DashboardPage() {
                     key={idx}
                     className={`w-10 h-10 md:w-12 md:h-12 rounded-lg font-display font-bold text-lg flex items-center justify-center transition-all transform ${
                       idx < stampCount
-                        ? 'bg-gradient-to-br from-secondary to-teal-500 text-white scale-110 shadow-lg'
+                        ? 'bg-gradient-to-br from-secondary to-accent text-white scale-110 shadow-lg'
                         : 'bg-border text-foreground/40'
                     }`}
                     style={{
@@ -254,7 +254,7 @@ export default function DashboardPage() {
               <div className="flex justify-center mb-8">
                 <div className="bg-gradient-to-br from-primary/20 to-secondary/20 p-8 rounded-2xl border-4 border-primary/30 shadow-lg">
                   <div className="bg-white p-6 rounded-lg shadow-md">
-                    <QRCode
+                    <QRCodeCanvas
                       value={user.phone}
                       size={256}
                       level="H"

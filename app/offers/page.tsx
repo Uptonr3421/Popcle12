@@ -152,10 +152,9 @@ export default function OffersPage() {
 
           {/* Geofence Status */}
           {nearStore ? (
-            <div className="card-vibrant bg-gradient-to-r from-secondary/20 via-teal-100/30 to-transparent p-6 border-2 border-secondary/50 animate-glow">
+            <div className="card-vibrant bg-gradient-to-r from-secondary/20 via-accent/20 to-transparent p-6 border-2 border-secondary/50 geofence-active">
               <p className="font-semibold text-secondary text-lg text-center flex items-center justify-center gap-2">
-                <span className="text-2xl animate-bounce">📍</span>
-                You're near Pop Culture CLE! All offers are active!
+                <span className="animate-bounce">You are near Pop Culture CLE! All offers are active!</span>
               </p>
             </div>
           ) : (
@@ -180,7 +179,7 @@ export default function OffersPage() {
                   key={offer.id}
                   className={`card-vibrant overflow-hidden shadow-xl hover:shadow-2xl transition-all transform hover:scale-105 ${
                     nearStore
-                      ? 'bg-gradient-to-br from-primary/20 to-secondary/20 border-2 border-primary/50 animate-glow'
+                      ? 'bg-gradient-to-br from-primary/20 to-secondary/20 border-2 border-primary/50 geofence-active'
                       : 'bg-card border border-border opacity-75'
                   }`}
                 >

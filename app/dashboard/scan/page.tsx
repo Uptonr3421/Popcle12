@@ -152,8 +152,8 @@ export default function ScanPage() {
           {message && (
             <div className={`card-vibrant p-4 text-center animate-bounce-in border-2 ${
               message.type === 'success' 
-                ? 'bg-green-900/50 border-green-500 text-green-300' 
-                : 'bg-red-900/50 border-red-500 text-red-300'
+                ? 'bg-accent/20 border-accent text-accent' 
+                : 'bg-destructive/20 border-destructive text-destructive'
             }`}>
               <p className="font-bold text-lg">
                 {message.type === 'success' ? '✓' : '✕'} {message.text}

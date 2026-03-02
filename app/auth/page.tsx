@@ -150,7 +150,7 @@ export default function AuthPage() {
               </div>
 
               {error && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm font-medium animate-bounce-in">
+                <div className="p-4 bg-destructive/10 border border-destructive/30 rounded-lg text-destructive text-sm font-medium animate-bounce-in">
                   {error}
                 </div>
               )}
@@ -206,7 +206,7 @@ export default function AuthPage() {
               </div>
 
               {error && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm font-medium animate-bounce-in">
+                <div className="p-4 bg-destructive/10 border border-destructive/30 rounded-lg text-destructive text-sm font-medium animate-bounce-in">
                   {error}
                 </div>
               )}
