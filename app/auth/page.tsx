@@ -45,13 +45,14 @@ export default function AuthPage() {
         throw new Error('Failed to verify phone');
       }
 
-      const { exists } = await response.json();
+      const { exists, name: userName, userType } = await response.json();
       
       if (exists) {
         // Phone exists, go to dashboard
         localStorage.setItem('userPhone', digits);
-        localStorage.setItem('userMode', isEmployee ? 'employee' : 'customer');
-        router.push(isEmployee ? '/dashboard/scan' : '/dashboard');
+        if (userName) localStorage.setItem('userName', userName);
+        localStorage.setItem('userMode', userType || (isEmployee ? 'employee' : 'customer'));
+        router.push((userType === 'employee' || isEmployee) ? '/dashboard/scan' : '/dashboard');
       } else {
         // New user, need name
         setStep('name');

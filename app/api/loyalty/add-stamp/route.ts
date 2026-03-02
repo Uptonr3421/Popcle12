@@ -63,10 +63,11 @@ export async function POST(req: NextRequest) {
       .from('loyalty_records')
       .insert([
         {
+          user_id: customer.id,
           customer_id: customer.id,
           employee_id: employee.id,
           action: 'stamp_added',
-          created_at: new Date().toISOString(),
+          stamp_added_at: new Date().toISOString(),
         },
       ]);
 
