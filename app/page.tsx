@@ -1,460 +1,435 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
-export default function SplashPage() {
-  const router = useRouter();
+export default function DemoLandingPage() {
   const [showIntro, setShowIntro] = useState(true);
-  const [showSplash, setShowSplash] = useState(false);
-  const [animationPhase, setAnimationPhase] = useState(0);
   const [introPhase, setIntroPhase] = useState(0);
-  const [selectedDemo, setSelectedDemo] = useState<string | null>(null);
+  const [activeFeature, setActiveFeature] = useState(0);
 
   useEffect(() => {
-    // Animate intro message phases
-    const introTimers = [
-      setTimeout(() => setIntroPhase(1), 500),
-      setTimeout(() => setIntroPhase(2), 1500),
-      setTimeout(() => setIntroPhase(3), 2500),
+    const timers = [
+      setTimeout(() => setIntroPhase(1), 400),
+      setTimeout(() => setIntroPhase(2), 1400),
+      setTimeout(() => setIntroPhase(3), 2400),
     ];
-    return () => introTimers.forEach(clearTimeout);
+    return () => timers.forEach(clearTimeout);
   }, []);
 
   useEffect(() => {
-    if (!showSplash) return;
-    // Animate splash screen phases
-    const timers = [
-      setTimeout(() => setAnimationPhase(1), 300),
-      setTimeout(() => setAnimationPhase(2), 600),
-      setTimeout(() => setAnimationPhase(3), 900),
-      setTimeout(() => setAnimationPhase(4), 1200),
-    ];
-    return () => timers.forEach(clearTimeout);
-  }, [showSplash]);
+    if (showIntro) return;
+    const interval = setInterval(() => {
+      setActiveFeature((prev) => (prev + 1) % 4);
+    }, 3500);
+    return () => clearInterval(interval);
+  }, [showIntro]);
 
-  const handleIntroComplete = () => {
-    setShowIntro(false);
-    setShowSplash(true);
-  };
+  const features = [
+    {
+      title: 'Digital Loyalty Cards',
+      description: 'Replace paper punch cards forever. Customers earn stamps automatically with every purchase - no more lost cards.',
+      icon: (
+        <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+        </svg>
+      ),
+    },
+    {
+      title: 'Instant QR Scanning',
+      description: 'Staff scans customer codes in 2 seconds flat. Works on any smartphone - no special hardware needed.',
+      icon: (
+        <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+        </svg>
+      ),
+    },
+    {
+      title: 'Customer Insights',
+      description: 'See who your best customers are, track visit patterns, and make smarter business decisions with real data.',
+      icon: (
+        <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+      ),
+    },
+    {
+      title: 'Smart Notifications',
+      description: 'Send special offers when customers are nearby. Bring them back with perfectly timed reminders.',
+      icon: (
+        <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+        </svg>
+      ),
+    },
+  ];
 
-  const handleEnterApp = () => {
-    setShowSplash(false);
-  };
-
-  const handleDemoSelect = (demo: string) => {
-    setSelectedDemo(demo);
-    setTimeout(() => {
-      router.push(demo);
-    }, 300);
-  };
-
-  // Personal intro message screen
+  // Personal intro screen for Nicole
   if (showIntro) {
     return (
-      <div className="min-h-screen bg-background overflow-hidden relative flex items-center justify-center">
-        {/* Subtle background glow */}
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
         <div className="absolute inset-0 overflow-hidden">
-          <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary/20 rounded-full blur-3xl transition-all duration-2000 ${introPhase >= 1 ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`} />
+          <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/10 rounded-full blur-3xl transition-all duration-[2000ms] ${introPhase >= 1 ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`} />
         </div>
 
-        <div className="relative z-10 text-center px-8 max-w-md mx-auto">
-          {/* Personal message */}
-          <div className={`transition-all duration-1000 ${introPhase >= 1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <p className="text-foreground/90 text-lg md:text-xl leading-relaxed font-medium italic">
+        <div className="relative z-10 max-w-md mx-auto text-center">
+          <div className={`transition-all duration-1000 ${introPhase >= 1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+            <p className="text-foreground/90 text-xl md:text-2xl leading-relaxed font-light">
               {'"'}This one{"'"}s for you, Nicole.
             </p>
-            <p className="text-foreground/80 text-lg md:text-xl leading-relaxed mt-4">
+            <p className="text-muted-foreground text-lg md:text-xl leading-relaxed mt-6">
               You{"'"}ve already built something Cleveland loves — now let{"'"}s make it even easier for them to come back.
             </p>
-            <p className="text-primary text-xl md:text-2xl font-bold mt-6">
+            <p className="text-primary text-2xl md:text-3xl font-bold mt-8">
               Welcome to Pop Culture CLE.
             </p>
           </div>
 
-          {/* Signature */}
-          <div className={`mt-12 transition-all duration-1000 delay-500 ${introPhase >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <p className="text-foreground font-semibold text-lg">
+          <div className={`mt-14 transition-all duration-1000 ${introPhase >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+            <p className="text-foreground font-medium text-lg">
               — Upton Rand
             </p>
-            <p className="text-secondary font-medium mt-1">
+            <p className="text-primary/80 font-medium mt-1">
               Alignment AI
             </p>
             <a 
               href="mailto:Contact@alignment-ai.io" 
-              className="text-accent text-sm hover:underline mt-2 inline-block"
+              className="text-muted-foreground text-sm hover:text-primary transition-colors mt-2 inline-block"
             >
               Contact@alignment-ai.io
             </a>
           </div>
 
-          {/* Continue button */}
-          <div className={`mt-16 transition-all duration-1000 delay-1000 ${introPhase >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <button
-              onClick={handleIntroComplete}
-              className="px-8 py-3 bg-primary text-primary-foreground rounded-full font-semibold hover:bg-primary/90 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-primary/30"
+          <div className={`mt-12 transition-all duration-1000 ${introPhase >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+            <Button
+              size="lg"
+              onClick={() => setShowIntro(false)}
+              className="px-10 py-6 text-lg font-semibold rounded-full"
             >
-              Continue
-            </button>
+              View Your App
+            </Button>
           </div>
         </div>
       </div>
     );
   }
 
-  if (showSplash) {
-    return (
-      <div className="min-h-screen bg-background overflow-hidden relative">
-        {/* Animated background elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          {/* Comic book halftone dots */}
-          <div className="absolute inset-0 halftone-overlay opacity-30" />
-          
-          {/* Floating geometric shapes */}
-          <div 
-            className={`absolute top-10 left-10 w-32 h-32 bg-primary/30 rounded-full blur-xl transition-all duration-1000 ${animationPhase >= 1 ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}
-            style={{ animationDelay: '0.2s' }}
-          />
-          <div 
-            className={`absolute top-40 right-20 w-48 h-48 bg-secondary/30 rounded-full blur-xl transition-all duration-1000 ${animationPhase >= 1 ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}
-            style={{ animationDelay: '0.4s' }}
-          />
-          <div 
-            className={`absolute bottom-32 left-20 w-40 h-40 bg-accent/30 rounded-full blur-xl transition-all duration-1000 ${animationPhase >= 1 ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}
-            style={{ animationDelay: '0.6s' }}
-          />
-          
-          {/* Comic burst stars */}
-          {animationPhase >= 2 && (
-            <>
-              <div className="absolute top-20 right-10 text-6xl animate-float-rotate" style={{ animationDelay: '0s' }}>
-                <span className="text-primary">{'★'}</span>
-              </div>
-              <div className="absolute top-60 left-8 text-4xl animate-float-rotate" style={{ animationDelay: '0.5s' }}>
-                <span className="text-secondary">{'★'}</span>
-              </div>
-              <div className="absolute bottom-40 right-16 text-5xl animate-float-rotate" style={{ animationDelay: '1s' }}>
-                <span className="text-accent">{'★'}</span>
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* Main content */}
-        <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-6 py-8">
-          {/* Hero Image */}
-          <div className={`mb-8 transition-all duration-700 ${animationPhase >= 1 ? 'animate-splash-zoom' : 'opacity-0 scale-110'}`}>
-            <div className="relative w-64 h-40 md:w-80 md:h-48 mx-auto rounded-2xl overflow-hidden border-4 border-primary/50 shadow-2xl shadow-primary/30">
-              <img 
-                src="/images/pop-culture-hero.jpg"
-                alt="Pop Culture CLE - Comics, Vinyl & Collectibles"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
-            </div>
-          </div>
-
-          {/* Logo burst */}
-          <div className={`mb-6 transition-all duration-700 ${animationPhase >= 2 ? 'animate-comic-burst' : 'opacity-0 scale-0'}`}>
-            <div className="relative">
-              {/* Comic burst background */}
-              <svg className="absolute -inset-6 w-[calc(100%+3rem)] h-[calc(100%+3rem)]" viewBox="0 0 200 200">
-                <polygon 
-                  points="100,10 120,80 190,80 135,120 155,190 100,150 45,190 65,120 10,80 80,80" 
-                  fill="url(#burstGradient)" 
-                  className="animate-pulse"
-                />
-                <defs>
-                  <linearGradient id="burstGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.4" />
-                    <stop offset="50%" stopColor="var(--secondary)" stopOpacity="0.3" />
-                    <stop offset="100%" stopColor="var(--accent)" stopOpacity="0.4" />
-                  </linearGradient>
-                </defs>
-              </svg>
-              
-              {/* Store logo */}
-              <div className="relative w-28 h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-primary shadow-2xl shadow-primary/50 mx-auto">
-                <img 
-                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/4902868e-33d5-4d7b-9adf-25927ab0ba5e.jpeg"
-                  alt="Pop Culture CLE"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Brand name with comic style */}
-          <div className={`text-center mb-4 transition-all duration-500 ${animationPhase >= 3 ? 'animate-splash-slide' : 'opacity-0 translate-y-10'}`}>
-            <h1 className="comic-text text-5xl md:text-7xl text-primary animate-neon-pulse comic-shadow">
-              POP CULTURE
-            </h1>
-            <h2 className="comic-text text-3xl md:text-5xl text-secondary -mt-1">
-              CLE
-            </h2>
-          </div>
-
-          {/* Tagline */}
-          <div className={`text-center mb-8 transition-all duration-500 delay-200 ${animationPhase >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <p className="text-lg md:text-xl text-foreground/80 font-medium max-w-xs mx-auto">
-              Comics, Vinyl, Collectibles & More
-            </p>
-            <p className="text-accent text-sm mt-2 font-semibold">
-              Solon, Ohio
-            </p>
-          </div>
-
-          {/* Loyalty badge */}
-          <div className={`mb-10 transition-all duration-500 delay-300 ${animationPhase >= 4 ? 'animate-comic-burst' : 'opacity-0 scale-0'}`}>
-            <div className="bg-card border-2 border-primary/50 rounded-2xl px-6 py-3 shadow-lg shadow-primary/20">
-              <div className="flex items-center gap-3">
-                <span className="text-3xl">🎫</span>
-                <div>
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider">Loyalty Rewards</p>
-                  <p className="text-primary font-bold text-lg">10 Stamps = FREE Item</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Enter button */}
-          <div className={`transition-all duration-500 delay-500 ${animationPhase >= 4 ? 'animate-splash-slide' : 'opacity-0 translate-y-10'}`}>
-            <button
-              onClick={handleEnterApp}
-              className="group relative px-12 py-4 bg-gradient-to-r from-primary via-secondary to-accent rounded-full font-bold text-lg text-primary-foreground shadow-xl hover:shadow-2xl hover:shadow-secondary/50 transition-all duration-300 hover:scale-105 active:scale-95"
-            >
-              <span className="relative z-10 flex items-center gap-2">
-                Enter App Preview
-                <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-secondary via-accent to-primary rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </button>
-          </div>
-
-          {/* Business info footer */}
-          <div className={`mt-12 text-center transition-all duration-500 delay-700 ${animationPhase >= 4 ? 'opacity-100' : 'opacity-0'}`}>
-            <p className="text-muted-foreground text-sm">
-              33549 Solon Rd, Solon, OH 44139
-            </p>
-            <p className="text-muted-foreground text-xs mt-1">
-              (216) 245-7316
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // App Preview Selection Screen
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-lg border-b border-border">
-        <div className="max-w-lg mx-auto px-4 py-4 flex items-center justify-between">
+      <header className="sticky top-0 z-50 bg-background/90 backdrop-blur-md border-b border-border">
+        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary">
-              <img 
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/4902868e-33d5-4d7b-9adf-25927ab0ba5e.jpeg"
-                alt="Pop Culture CLE"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div>
-              <h1 className="font-bold text-primary text-lg">Pop Culture CLE</h1>
-              <p className="text-xs text-muted-foreground">App Preview Mode</p>
-            </div>
+            <img 
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/4902868e-33d5-4d7b-9adf-25927ab0ba5e.jpeg"
+              alt="Pop Culture CLE"
+              className="w-9 h-9 rounded-full object-cover border-2 border-primary/30"
+            />
+            <span className="font-bold text-lg text-foreground hidden sm:block">Pop Culture CLE</span>
           </div>
-          <button
-            onClick={() => setShowSplash(true)}
-            className="text-muted-foreground hover:text-foreground text-sm"
-          >
-            Back
-          </button>
+          <nav className="flex items-center gap-2 sm:gap-6">
+            <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Features</a>
+            <a href="#demo" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Demo</a>
+            <Link href="/auth">
+              <Button size="sm" className="rounded-full px-4">
+                Try App
+              </Button>
+            </Link>
+          </nav>
         </div>
       </header>
 
-      {/* Main content */}
-      <main className="max-w-lg mx-auto px-4 py-8">
-        {/* Welcome message */}
-        <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-foreground mb-2">
-            Welcome, Store Owner!
-          </h2>
-          <p className="text-muted-foreground">
-            Test your loyalty app features below. Each demo is fully functional.
-          </p>
+      {/* Hero Section */}
+      <section className="py-16 md:py-24 px-4">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex flex-col lg:flex-row items-center gap-12">
+            <div className="flex-1 text-center lg:text-left">
+              <div className="inline-block px-4 py-1.5 bg-primary/10 rounded-full mb-6">
+                <span className="text-primary text-sm font-medium">Built for Pop Culture CLE</span>
+              </div>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight text-balance">
+                Turn every visit into lasting loyalty
+              </h1>
+              <p className="mt-6 text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0">
+                A digital rewards program that keeps customers coming back. No paper cards. No lost stamps. Just simple, powerful loyalty.
+              </p>
+              <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
+                <Link href="/auth">
+                  <Button size="lg" className="w-full sm:w-auto px-8 py-6 text-base font-semibold rounded-full">
+                    Try the Demo
+                  </Button>
+                </Link>
+                <a href="#features">
+                  <Button variant="outline" size="lg" className="w-full sm:w-auto px-8 py-6 text-base rounded-full">
+                    See Features
+                  </Button>
+                </a>
+              </div>
+            </div>
+            
+            {/* Store Images Grid */}
+            <div className="flex-1 w-full max-w-md">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="aspect-square rounded-2xl overflow-hidden border border-border">
+                  <img 
+                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/4902868e-33d5-4d7b-9adf-25927ab0ba5e.jpeg"
+                    alt="Pop Culture CLE"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="aspect-square rounded-2xl overflow-hidden border border-border">
+                  <img 
+                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/81ccd041-ddbb-4a54-95b2-e2609a59427d.jpeg"
+                    alt="Store Interior"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="aspect-square rounded-2xl overflow-hidden border border-border">
+                  <img 
+                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/c4d27db8-4d52-48b1-a5d2-ccc0160d0509.jpeg"
+                    alt="Collectibles"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="aspect-square rounded-2xl overflow-hidden border border-border">
+                  <img 
+                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/a8db6a6b-90e0-4e76-aae4-d559eb291f50.jpeg"
+                    alt="Products"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+      </section>
 
-        {/* Demo Cards */}
-        <div className="space-y-4">
-          {/* Customer Experience */}
-          <button
-            onClick={() => handleDemoSelect('/auth')}
-            className={`w-full text-left group transition-all duration-300 ${selectedDemo === '/auth' ? 'scale-95 opacity-50' : ''}`}
-          >
-            <div className="bg-gradient-to-br from-primary/20 to-secondary/20 rounded-2xl p-6 border border-primary/30 hover:border-primary/60 hover:shadow-xl hover:shadow-primary/20 transition-all">
-              <div className="flex items-start gap-4">
-                <div className="w-14 h-14 bg-primary rounded-xl flex items-center justify-center text-2xl shrink-0">
-                  📱
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-bold text-lg text-foreground group-hover:text-primary transition-colors">
-                    Customer Experience
-                  </h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Sign up, view stamps, scan QR codes, and redeem rewards
-                  </p>
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    <span className="px-2 py-1 bg-primary/20 text-primary text-xs rounded-full">Sign Up</span>
-                    <span className="px-2 py-1 bg-secondary/20 text-secondary text-xs rounded-full">QR Code</span>
-                    <span className="px-2 py-1 bg-accent/20 text-accent text-xs rounded-full">Stamps</span>
-                  </div>
-                </div>
-                <svg className="w-6 h-6 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </div>
-          </button>
-
-          {/* Employee Scanner */}
-          <button
-            onClick={() => handleDemoSelect('/auth?mode=employee')}
-            className={`w-full text-left group transition-all duration-300 ${selectedDemo === '/auth?mode=employee' ? 'scale-95 opacity-50' : ''}`}
-          >
-            <div className="bg-gradient-to-br from-secondary/20 to-accent/20 rounded-2xl p-6 border border-secondary/30 hover:border-secondary/60 hover:shadow-xl hover:shadow-secondary/20 transition-all">
-              <div className="flex items-start gap-4">
-                <div className="w-14 h-14 bg-secondary rounded-xl flex items-center justify-center text-2xl shrink-0">
-                  📷
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-bold text-lg text-foreground group-hover:text-secondary transition-colors">
-                    Employee Scanner
-                  </h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Scan customer QR codes and add stamps to their accounts
-                  </p>
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    <span className="px-2 py-1 bg-secondary/20 text-secondary text-xs rounded-full">Camera</span>
-                    <span className="px-2 py-1 bg-primary/20 text-primary text-xs rounded-full">Add Stamps</span>
-                  </div>
-                </div>
-                <svg className="w-6 h-6 text-muted-foreground group-hover:text-secondary group-hover:translate-x-1 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </div>
-          </button>
-
-          {/* Admin Dashboard */}
-          <button
-            onClick={() => handleDemoSelect('/admin')}
-            className={`w-full text-left group transition-all duration-300 ${selectedDemo === '/admin' ? 'scale-95 opacity-50' : ''}`}
-          >
-            <div className="bg-gradient-to-br from-accent/20 to-primary/20 rounded-2xl p-6 border border-accent/30 hover:border-accent/60 hover:shadow-xl hover:shadow-accent/20 transition-all">
-              <div className="flex items-start gap-4">
-                <div className="w-14 h-14 bg-accent rounded-xl flex items-center justify-center text-2xl shrink-0">
-                  ⚙️
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-bold text-lg text-foreground group-hover:text-accent transition-colors">
-                    Admin Dashboard
-                  </h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Manage customers, create offers, and view analytics
-                  </p>
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    <span className="px-2 py-1 bg-accent/20 text-accent text-xs rounded-full">Customers</span>
-                    <span className="px-2 py-1 bg-secondary/20 text-secondary text-xs rounded-full">Offers</span>
-                    <span className="px-2 py-1 bg-primary/20 text-primary text-xs rounded-full">Analytics</span>
-                  </div>
-                </div>
-                <svg className="w-6 h-6 text-muted-foreground group-hover:text-accent group-hover:translate-x-1 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </div>
-          </button>
-
-          {/* Geofence Offers */}
-          <button
-            onClick={() => handleDemoSelect('/offers')}
-            className={`w-full text-left group transition-all duration-300 ${selectedDemo === '/offers' ? 'scale-95 opacity-50' : ''}`}
-          >
-            <div className="bg-gradient-to-br from-purple-500/20 to-secondary/20 rounded-2xl p-6 border border-purple-500/30 hover:border-purple-500/60 hover:shadow-xl hover:shadow-purple-500/20 transition-all">
-              <div className="flex items-start gap-4">
-                <div className="w-14 h-14 bg-purple-500 rounded-xl flex items-center justify-center text-2xl shrink-0">
-                  📍
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-bold text-lg text-foreground group-hover:text-purple-400 transition-colors">
-                    Geofence Offers
-                  </h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Location-based deals that activate near your store
-                  </p>
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    <span className="px-2 py-1 bg-purple-500/20 text-purple-400 text-xs rounded-full">GPS</span>
-                    <span className="px-2 py-1 bg-primary/20 text-primary text-xs rounded-full">Deals</span>
-                  </div>
-                </div>
-                <svg className="w-6 h-6 text-muted-foreground group-hover:text-purple-400 group-hover:translate-x-1 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </div>
-          </button>
-        </div>
-
-        {/* Store showcase */}
-        <div className="mt-10">
-          <h3 className="text-lg font-bold text-foreground mb-4 text-center">Pop Culture CLE</h3>
-          <div className="grid grid-cols-2 gap-3">
+      {/* Stats */}
+      <section className="py-10 bg-card border-y border-border">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
-              { src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/4902868e-33d5-4d7b-9adf-25927ab0ba5e.jpeg', alt: 'Pop Culture CLE Logo' },
-              { src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/81ccd041-ddbb-4a54-95b2-e2609a59427d.jpeg', alt: 'Store Interior' },
-              { src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/c4d27db8-4d52-48b1-a5d2-ccc0160d0509.jpeg', alt: 'Collectibles Display' },
-              { src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/a8db6a6b-90e0-4e76-aae4-d559eb291f50.jpeg', alt: 'Pop Culture Products' },
-            ].map((img, idx) => (
+              { value: '10x', label: 'More repeat visits' },
+              { value: '85%', label: 'Customer retention' },
+              { value: '2 sec', label: 'Scan time' },
+              { value: '$0', label: 'Hardware cost' },
+            ].map((stat) => (
+              <div key={stat.label} className="text-center">
+                <p className="text-2xl md:text-3xl font-bold text-primary">{stat.value}</p>
+                <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section id="features" className="py-16 md:py-24 px-4">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+              Everything you need
+            </h2>
+            <p className="mt-3 text-lg text-muted-foreground">
+              A complete loyalty solution built specifically for your store
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-4">
+            {features.map((feature, idx) => (
               <div 
-                key={idx} 
-                className="aspect-square rounded-xl overflow-hidden border-2 border-border hover:border-primary transition-colors hover:scale-105 duration-300"
+                key={feature.title}
+                className={`p-6 rounded-2xl border transition-all duration-300 ${
+                  activeFeature === idx 
+                    ? 'bg-primary/5 border-primary/30' 
+                    : 'bg-card border-border hover:border-primary/20'
+                }`}
+                onClick={() => setActiveFeature(idx)}
               >
-                <img src={img.src} alt={img.alt} className="w-full h-full object-cover" />
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${
+                  activeFeature === idx ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+                }`}>
+                  {feature.icon}
+                </div>
+                <h3 className="text-lg font-bold text-foreground mb-2">{feature.title}</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">{feature.description}</p>
               </div>
             ))}
           </div>
         </div>
+      </section>
 
-        {/* Features summary */}
-        <div className="mt-10 bg-card rounded-2xl p-6 border border-border">
-          <h3 className="font-bold text-foreground mb-4 text-center">App Features</h3>
-          <div className="grid grid-cols-2 gap-4">
+      {/* Demo Section */}
+      <section id="demo" className="py-16 md:py-24 px-4 bg-card">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+              Try it yourself
+            </h2>
+            <p className="mt-3 text-lg text-muted-foreground">
+              Experience the app exactly as your customers and staff will
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-3 gap-4">
+            <Link 
+              href="/auth"
+              className="group p-6 bg-background rounded-2xl border border-border hover:border-primary/50 transition-all"
+            >
+              <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                <svg className="w-7 h-7 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <h3 className="font-bold text-foreground mb-1">Customer View</h3>
+              <p className="text-sm text-muted-foreground mb-3">See loyalty card, stamps & QR code</p>
+              <span className="text-primary text-sm font-medium group-hover:underline">Try as customer</span>
+            </Link>
+
+            <Link 
+              href="/auth?mode=employee"
+              className="group p-6 bg-background rounded-2xl border border-border hover:border-primary/50 transition-all"
+            >
+              <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                <svg className="w-7 h-7 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                </svg>
+              </div>
+              <h3 className="font-bold text-foreground mb-1">Employee Scanner</h3>
+              <p className="text-sm text-muted-foreground mb-3">Scan codes & add stamps</p>
+              <span className="text-primary text-sm font-medium group-hover:underline">Try as employee</span>
+            </Link>
+
+            <Link 
+              href="/admin"
+              className="group p-6 bg-background rounded-2xl border border-border hover:border-primary/50 transition-all"
+            >
+              <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                <svg className="w-7 h-7 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <h3 className="font-bold text-foreground mb-1">Owner Dashboard</h3>
+              <p className="text-sm text-muted-foreground mb-3">Manage customers & offers</p>
+              <span className="text-primary text-sm font-medium group-hover:underline">Try as owner</span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="py-16 md:py-24 px-4">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+              Simple for everyone
+            </h2>
+          </div>
+
+          <div className="grid sm:grid-cols-3 gap-8">
             {[
-              { icon: '🎫', label: 'Digital Stamps' },
-              { icon: '📱', label: 'QR Codes' },
-              { icon: '📍', label: 'Geofencing' },
-              { icon: '🔔', label: 'Push Alerts' },
-              { icon: '🎁', label: 'Rewards' },
-              { icon: '📊', label: 'Analytics' },
-            ].map((feature, idx) => (
-              <div key={idx} className="flex items-center gap-2 text-sm">
-                <span className="text-xl">{feature.icon}</span>
-                <span className="text-foreground/80">{feature.label}</span>
+              { step: '1', title: 'Customer signs up', desc: 'Quick phone registration. No app download required.' },
+              { step: '2', title: 'Show QR at checkout', desc: 'Staff scans the code. Stamp added instantly.' },
+              { step: '3', title: 'Earn free rewards', desc: '10 stamps = 1 free item. They keep coming back.' },
+            ].map((item) => (
+              <div key={item.step} className="text-center">
+                <div className="w-14 h-14 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
+                  {item.step}
+                </div>
+                <h3 className="font-bold text-foreground mb-2">{item.title}</h3>
+                <p className="text-sm text-muted-foreground">{item.desc}</p>
               </div>
             ))}
           </div>
         </div>
+      </section>
 
-        {/* Contact info */}
-        <div className="mt-8 text-center text-sm text-muted-foreground">
-          <p className="font-medium text-foreground">Pop Culture CLE</p>
-          <p>33549 Solon Rd, Solon, OH 44139</p>
-          <p>(216) 245-7316</p>
+      {/* App Features List */}
+      <section className="py-16 md:py-24 px-4 bg-card">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+              What{"'"}s included
+            </h2>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-x-12 gap-y-4 max-w-3xl mx-auto">
+            {[
+              'Digital loyalty cards for all customers',
+              'QR code scanning from any smartphone',
+              'Real-time stamp tracking',
+              'Customer visit analytics',
+              'Automatic reward redemption',
+              'Push notifications (coming soon)',
+              'Location-based offers',
+              'Admin dashboard',
+              'Employee scanner mode',
+              'Customer database',
+              'Export customer data',
+              'iPhone app ready',
+            ].map((item) => (
+              <div key={item} className="flex items-center gap-3 py-2">
+                <svg className="w-5 h-5 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <span className="text-foreground">{item}</span>
+              </div>
+            ))}
+          </div>
         </div>
-      </main>
+      </section>
+
+      {/* CTA */}
+      <section className="py-16 md:py-24 px-4">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+            Ready to reward your customers?
+          </h2>
+          <p className="mt-4 text-lg text-muted-foreground">
+            This app is built and ready for Pop Culture CLE. Let{"'"}s launch it together.
+          </p>
+          <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+            <Link href="/auth">
+              <Button size="lg" className="w-full sm:w-auto px-8 py-6 text-base font-semibold rounded-full">
+                Try the Full Demo
+              </Button>
+            </Link>
+            <a href="mailto:Contact@alignment-ai.io">
+              <Button variant="outline" size="lg" className="w-full sm:w-auto px-8 py-6 text-base rounded-full">
+                Contact Alignment AI
+              </Button>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-8 border-t border-border">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <img 
+                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/4902868e-33d5-4d7b-9adf-25927ab0ba5e.jpeg"
+                alt="Pop Culture CLE"
+                className="w-8 h-8 rounded-full object-cover"
+              />
+              <span className="font-semibold text-foreground">Pop Culture CLE</span>
+            </div>
+            <div className="text-center sm:text-right">
+              <p className="text-sm text-muted-foreground">
+                Built by{' '}
+                <a href="https://alignment-ai.io" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                  Alignment AI
+                </a>
+              </p>
+              <p className="text-xs text-muted-foreground/60 mt-1">
+                33549 Solon Rd, Solon, OH 44139
+              </p>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
