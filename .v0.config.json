@@ -1,51 +1,17 @@
 {
-  "version": "1.0",
   "projectId": "prj_VVDatbRYlUGcSH6EgxUFhEMXhGxi",
-  "framework": "react",
-  "language": "typescript",
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
   "componentDirectories": [
-    "client/src/components",
-    "client/src/pages"
+    "components"
   ],
-  "componentFileExtensions": [
-    ".tsx",
-    ".ts",
-    ".jsx",
-    ".js"
-  ],
-  "excludePatterns": [
-    "node_modules/**",
-    "dist/**",
-    ".next/**",
-    "build/**",
-    "**/*.test.*",
-    "**/*.spec.*",
-    "**/.*"
-  ],
-  "importAliases": {
-    "@": "./client/src",
-    "@shared": "./shared"
-  },
-  "buildCommand": "pnpm build",
-  "devCommand": "pnpm dev",
-  "outputDirectory": "dist",
-  "previewUrl": "http://localhost:3000",
-  "packageManager": "pnpm",
-  "nodeVersion": "20.x",
-  "env": {
-    "VITE_APP_TITLE": "Popcle12",
-    "VITE_APP_LOGO": "",
-    "VITE_APP_ID": "popcle12",
-    "VITE_ANALYTICS_ENDPOINT": "",
-    "VITE_ANALYTICS_WEBSITE_ID": "",
-    "VITE_FRONTEND_FORGE_API_URL": "",
-    "VITE_FRONTEND_FORGE_API_KEY": "",
-    "VITE_OAUTH_PORTAL_URL": ""
-  },
+  "importAlias": "@",
+  "framework": "nextjs",
+  "typescript": true,
+  "tailwind": true,
   "gitSync": {
     "enabled": true,
     "autoCommit": true,
-    "protectMain": true,
-    "branchPrefix": "v0/"
+    "autoPush": true
   }
 }

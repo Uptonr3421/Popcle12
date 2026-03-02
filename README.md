@@ -1,59 +1,27 @@
-# Popcle12 - Loyalty App
+# Popcle - Loyalty App
 
-A modern loyalty application built with React, TypeScript, and Tailwind CSS, optimized for Vercel deployment and v0 by Vercel editing.
+A modern loyalty program application built with Next.js, Tailwind CSS, and Vercel deployment.
 
-## Project Overview
+## Quick Links
 
-**Popcle12** is a loyalty application designed to help businesses manage customer rewards and engagement. The project is configured for seamless integration with Vercel and v0 by Vercel, enabling collaborative development through AI-assisted code generation and GitHub-based workflows.
-
-### Quick Links
-
-- **v0 Project**: [https://v0.app/chat/rGDFcrHa6iZ](https://v0.app/chat/rGDFcrHa6iZ)
-- **GitHub Repository**: [https://github.com/Uptonr3421/Popcle12](https://github.com/Uptonr3421/Popcle12)
+- **v0 Project**: https://v0.app/chat/rGDFcrHa6iZ
+- **GitHub Repository**: https://github.com/Uptonr3421/Popcle12
 - **Vercel Project ID**: `prj_VVDatbRYlUGcSH6EgxUFhEMXhGxi`
 
-## Tech Stack
+## Technology Stack
 
-- **Frontend Framework**: React 19 with TypeScript
-- **Build Tool**: Vite
-- **Styling**: Tailwind CSS 4
-- **UI Components**: shadcn/ui with Radix UI
-- **Package Manager**: pnpm
+- **Framework**: Next.js 15.0+
+- **Styling**: Tailwind CSS 3.4+
+- **Language**: TypeScript
 - **Deployment**: Vercel
-- **Version Control**: GitHub with v0 integration
-
-## Project Structure
-
-```
-Popcle12/
-├── client/                 # Frontend application
-│   ├── public/            # Static assets (favicon, robots.txt, etc.)
-│   ├── src/
-│   │   ├── components/    # Reusable UI components
-│   │   ├── pages/         # Page-level components
-│   │   ├── contexts/      # React context providers
-│   │   ├── hooks/         # Custom React hooks
-│   │   ├── lib/           # Utility functions
-│   │   ├── App.tsx        # Main application component
-│   │   ├── main.tsx       # React entry point
-│   │   └── index.css      # Global styles and design tokens
-│   └── index.html         # HTML template
-├── shared/                # Shared types and constants
-├── server/                # Server-side code (placeholder)
-├── vercel.json           # Vercel deployment configuration
-├── .v0.config.json       # v0 by Vercel configuration
-├── next.config.js        # Next.js compatibility configuration
-├── vite.config.ts        # Vite build configuration
-├── tsconfig.json         # TypeScript configuration
-└── package.json          # Project dependencies
-```
+- **Package Manager**: npm
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 20.x or higher
-- pnpm 10.x or higher
+- Node.js 24.x or higher
+- npm or yarn package manager
 - Git
 
 ### Installation
@@ -64,124 +32,120 @@ git clone https://github.com/Uptonr3421/Popcle12.git
 cd Popcle12
 
 # Install dependencies
-pnpm install
+npm install
 
 # Start development server
-pnpm dev
+npm run dev
 ```
 
-The development server will start at `http://localhost:3000`.
+The application will be available at `http://localhost:3000`
 
-## Available Scripts
+## Development
 
-| Command | Description |
-|---------|-------------|
-| `pnpm dev` | Start development server with hot reload |
-| `pnpm build` | Build for production |
-| `pnpm preview` | Preview production build locally |
-| `pnpm check` | Run TypeScript type checking |
-| `pnpm format` | Format code with Prettier |
+### Available Scripts
+
+```bash
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Start production server
+npm run start
+
+# Run linting
+npm run lint
+```
+
+## Project Structure
+
+```
+├── app/                    # Next.js app directory
+│   ├── layout.tsx         # Root layout component
+│   ├── page.tsx           # Home page
+│   └── globals.css        # Global styles
+├── components/            # Reusable React components
+├── hooks/                 # Custom React hooks
+├── lib/                   # Utility functions
+├── public/                # Static assets
+├── styles/                # Additional stylesheets
+├── utils/                 # Helper utilities
+├── package.json           # Dependencies and scripts
+├── tsconfig.json          # TypeScript configuration
+├── tailwind.config.ts     # Tailwind CSS configuration
+├── next.config.mjs        # Next.js configuration
+├── vercel.json            # Vercel deployment configuration
+├── .v0.config.json        # v0 by Vercel configuration
+└── README.md              # This file
+```
 
 ## Vercel Deployment
 
-This project is configured for automatic deployment to Vercel.
+### Automatic Deployment
 
-### Setup
+The repository is configured for automatic deployment on Vercel:
 
-1. **Connect GitHub Repository**: Push your code to the `Uptonr3421/Popcle12` repository on GitHub.
+1. Push changes to the `main` branch
+2. Vercel automatically detects the push
+3. Builds and deploys the application
+4. Preview deployments created for pull requests
 
-2. **Create Vercel Project**: 
-   - Go to [Vercel Dashboard](https://vercel.com/dashboard)
-   - Click "New Project"
-   - Select the `Popcle12` repository
-   - Vercel will automatically detect the Vite configuration
+### Manual Deployment
 
-3. **Environment Variables**: Configure the following environment variables in Vercel project settings:
-   - `VITE_APP_TITLE`
-   - `VITE_APP_LOGO`
-   - `VITE_APP_ID`
-   - `VITE_ANALYTICS_ENDPOINT`
-   - `VITE_ANALYTICS_WEBSITE_ID`
-   - `VITE_FRONTEND_FORGE_API_URL`
-   - `VITE_FRONTEND_FORGE_API_KEY`
-   - `VITE_OAUTH_PORTAL_URL`
+```bash
+# Deploy to Vercel
+npm run build
+vercel deploy
+```
 
-4. **Deploy**: Push to the repository to trigger automatic deployments.
+### Environment Variables
+
+Configure environment variables in Vercel project settings:
+
+- `NEXT_PUBLIC_APP_URL`: Application URL (auto-set by Vercel)
 
 ## v0 by Vercel Integration
 
-This project is fully configured for v0 by Vercel, enabling AI-assisted development and editing.
-
 ### Setup
 
-1. **Connect to v0**:
-   - Go to [v0.app](https://v0.app)
-   - Create a new project or import existing one
-   - Connect your GitHub repository (`Uptonr3421/Popcle12`)
-   - Select the Vercel project (ID: `prj_VVDatbRYlUGcSH6EgxUFhEMXhGxi`)
+1. Visit https://v0.app
+2. Connect your GitHub repository (`Uptonr3421/Popcle12`)
+3. Link to Vercel project ID: `prj_VVDatbRYlUGcSH6EgxUFhEMXhGxi`
+4. Start editing with AI assistance
 
-2. **Workflow**:
-   - v0 automatically creates feature branches (e.g., `v0/main-abc123`)
-   - Changes are auto-committed as you work
-   - Create pull requests directly from v0
-   - Merge PRs to deploy to Vercel
+### Workflow
 
-3. **Component Development**:
-   - Components in `client/src/components/` are automatically available in v0
-   - Use shadcn/ui components for consistency
-   - Follow TypeScript best practices for type safety
+- v0 creates feature branches automatically (`v0/main-*`)
+- Changes are auto-committed as you work
+- Create pull requests from v0 interface
+- Merge to main for automatic Vercel deployment
 
-### Configuration Files
+### Component Guidelines
 
-- **`.v0.config.json`**: Specifies project settings, component directories, and build configuration for v0
-- **`vercel.json`**: Defines Vercel deployment settings, build commands, and environment variables
-- **`.vercelignore`**: Excludes unnecessary files from deployment
+- Store components in `components/` directory
+- Use TypeScript for type safety
+- Follow Tailwind CSS conventions
+- Maintain consistent naming patterns
 
-## Development Guidelines
+## Build Configuration
 
-### Component Development
+### Vercel Configuration (vercel.json)
 
-1. **Create components in `client/src/components/`** following the shadcn/ui pattern
-2. **Use TypeScript** for all components with proper type definitions
-3. **Export components as named exports** for v0 recognition
-4. **Follow the existing design system** defined in `client/src/index.css`
+- **Build Command**: `next build`
+- **Output Directory**: `.next`
+- **Dev Command**: `npm run dev`
+- **Install Command**: `npm install`
+- **Framework**: Next.js
+- **Node Version**: 24.x
 
-### Styling
+### v0 Configuration (.v0.config.json)
 
-- Use Tailwind CSS utilities for styling
-- Define design tokens in `client/src/index.css`
-- Maintain consistency with the existing color palette and spacing system
-- Implement responsive design with mobile-first approach
-
-### State Management
-
-- Use React hooks (useState, useContext, useReducer) for state management
-- Leverage React Context for global state
-- Keep component state local when possible
-
-## Design System
-
-The project includes a comprehensive design system with:
-
-- **Color Palette**: Defined as CSS variables in `index.css`
-- **Typography**: Font system with hierarchy rules
-- **Spacing**: Consistent spacing scale
-- **Components**: Pre-built shadcn/ui components ready for use
-
-## Performance Optimization
-
-- Code splitting with Vite
-- Lazy loading for routes and components
-- Image optimization for web
-- CSS minification and tree-shaking
-- Production source maps disabled for security
-
-## Security
-
-- Content Security Policy headers configured
-- XSS protection enabled
-- Frame options set to SAMEORIGIN
-- Referrer policy configured for privacy
+- **Project ID**: `prj_VVDatbRYlUGcSH6EgxUFhEMXhGxi`
+- **Framework**: Next.js
+- **TypeScript**: Enabled
+- **Tailwind**: Enabled
+- **Git Sync**: Enabled with auto-commit and auto-push
 
 ## Troubleshooting
 
@@ -189,43 +153,31 @@ The project includes a comprehensive design system with:
 
 If you encounter build errors:
 
-1. Clear node_modules and reinstall: `rm -rf node_modules pnpm-lock.yaml && pnpm install`
-2. Check TypeScript errors: `pnpm check`
-3. Review Vite configuration in `vite.config.ts`
+1. Clear cache: `rm -rf .next node_modules`
+2. Reinstall dependencies: `npm install`
+3. Rebuild: `npm run build`
+
+### Vercel Deployment Issues
+
+- Check build logs in Vercel dashboard
+- Verify environment variables are set
+- Ensure Node.js version matches (24.x)
+- Check for TypeScript errors: `npm run lint`
 
 ### v0 Integration Issues
 
-If v0 cannot connect:
-
-1. Verify GitHub repository is public or v0 has access
-2. Check Vercel project ID in `.v0.config.json`
-3. Ensure environment variables are configured in Vercel
-4. Review v0 documentation at [v0.app/docs](https://v0.app/docs)
-
-### Deployment Issues
-
-If deployment fails:
-
-1. Check build logs in Vercel dashboard
-2. Verify all environment variables are set
-3. Review `.vercelignore` for excluded files
-4. Ensure `vercel.json` is properly formatted
+- Ensure GitHub repository is connected
+- Verify Vercel project ID is correct
+- Check that component directories exist
+- Confirm TypeScript and Tailwind are enabled
 
 ## Contributing
 
-1. Create a feature branch from the main branch
-2. Make your changes and commit with descriptive messages
-3. Create a pull request for review
-4. After approval, merge to main for deployment
-
-## Resources
-
-- [Vercel Documentation](https://vercel.com/docs)
-- [v0 by Vercel Documentation](https://v0.app/docs)
-- [React Documentation](https://react.dev)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
-- [shadcn/ui Documentation](https://ui.shadcn.com)
-- [Vite Documentation](https://vitejs.dev)
+1. Create a feature branch: `git checkout -b feature/your-feature`
+2. Make your changes
+3. Commit: `git commit -am 'Add feature'`
+4. Push: `git push origin feature/your-feature`
+5. Create a pull request
 
 ## License
 
@@ -234,15 +186,6 @@ MIT
 ## Support
 
 For issues and questions:
-
-1. Check existing GitHub issues
-2. Review v0 documentation and FAQs
-3. Contact Vercel support for deployment issues
-4. Refer to framework documentation for development questions
-
----
-
-**Project ID**: prj_VVDatbRYlUGcSH6EgxUFhEMXhGxi  
-**Repository**: https://github.com/Uptonr3421/Popcle12  
-**Deployment**: Vercel  
-**Last Updated**: March 2, 2026
+- GitHub Issues: https://github.com/Uptonr3421/Popcle12/issues
+- v0 Support: https://v0.app/chat/rGDFcrHa6iZ
+- Vercel Support: https://vercel.com/support

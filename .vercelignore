@@ -1,56 +1,46 @@
 # Dependencies
-node_modules/
+node_modules
 .pnp
 .pnp.js
+.yarn/install-state.gz
 
 # Testing
-coverage/
-.nyc_output/
+coverage
+
+# Next.js
+.next
+out
+.turbo
 
 # Production
-dist/
-build/
-out/
+build
 
 # Misc
 .DS_Store
 *.pem
-*.log
+.env*.local
+.env.*.local
+
+# Debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
-# Local env files
-.env
-.env.local
-.env.*.local
 
 # IDE
-.vscode/
-.idea/
+.vscode
+.idea
 *.swp
 *.swo
-*~
 
 # Git
-.git/
+.git
 .gitignore
 
-# Documentation
-README.md
-CHANGELOG.md
-LICENSE
+# CI/CD
+.github
+.gitlab-ci.yml
+.travis.yml
 
-# Development
-.manus-logs/
-.vercelignore
-vercel.json
-vite.config.ts
-tsconfig*.json
-vitest.config.ts
-patches/
-server/
-shared/
-components.json
+# Documentation
+docs
+.md
