@@ -48,17 +48,17 @@ export default function Home() {
             {/* Product Image Grid */}
             <div className="mb-12 grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 max-w-3xl mx-auto">
               {[
-                { src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/c4d27db8-4d52-48b1-a5d2-ccc0160d0509.jpeg', alt: 'Colorful popsicle with sprinkles' },
-                { src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/a8db6a6b-90e0-4e76-aae4-d559eb291f50.jpeg', alt: 'Ice cream cones display' },
-                { src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/4902868e-33d5-4d7b-9adf-25927ab0ba5e.jpeg', alt: 'Pop Culture CLE storefront sign' },
+                { src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/f448500b-11ef-4260-adfe-519e013d51b4.jpeg', alt: 'Delicious ice cream cones on tiered display' },
+                { src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/f18f42a3-dfa2-434d-84e0-de445bd2b893.jpeg', alt: 'Ice cream cone with colorful Fruity Pebbles toppings' },
+                { src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/0f959b41-d455-476b-9f09-d387394e16a1.jpeg', alt: 'Pop Culture CLE branded container - Handcrafted Dessert Shop' },
               ].map((product, idx) => (
-                <div key={idx} className="relative group rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-110 h-32 md:h-48 cursor-pointer">
+                <div key={idx} className="relative group rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 h-40 md:h-56 cursor-pointer">
                   <img 
                     src={product.src} 
                     alt={product.alt}
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
               ))}
             </div>
