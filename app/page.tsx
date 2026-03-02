@@ -5,11 +5,24 @@ import { useRouter } from 'next/navigation';
 
 export default function SplashPage() {
   const router = useRouter();
-  const [showSplash, setShowSplash] = useState(true);
+  const [showIntro, setShowIntro] = useState(true);
+  const [showSplash, setShowSplash] = useState(false);
   const [animationPhase, setAnimationPhase] = useState(0);
+  const [introPhase, setIntroPhase] = useState(0);
   const [selectedDemo, setSelectedDemo] = useState<string | null>(null);
 
   useEffect(() => {
+    // Animate intro message phases
+    const introTimers = [
+      setTimeout(() => setIntroPhase(1), 500),
+      setTimeout(() => setIntroPhase(2), 1500),
+      setTimeout(() => setIntroPhase(3), 2500),
+    ];
+    return () => introTimers.forEach(clearTimeout);
+  }, []);
+
+  useEffect(() => {
+    if (!showSplash) return;
     // Animate splash screen phases
     const timers = [
       setTimeout(() => setAnimationPhase(1), 300),
@@ -18,7 +31,12 @@ export default function SplashPage() {
       setTimeout(() => setAnimationPhase(4), 1200),
     ];
     return () => timers.forEach(clearTimeout);
-  }, []);
+  }, [showSplash]);
+
+  const handleIntroComplete = () => {
+    setShowIntro(false);
+    setShowSplash(true);
+  };
 
   const handleEnterApp = () => {
     setShowSplash(false);
@@ -30,6 +48,59 @@ export default function SplashPage() {
       router.push(demo);
     }, 300);
   };
+
+  // Personal intro message screen
+  if (showIntro) {
+    return (
+      <div className="min-h-screen bg-background overflow-hidden relative flex items-center justify-center">
+        {/* Subtle background glow */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary/20 rounded-full blur-3xl transition-all duration-2000 ${introPhase >= 1 ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`} />
+        </div>
+
+        <div className="relative z-10 text-center px-8 max-w-md mx-auto">
+          {/* Personal message */}
+          <div className={`transition-all duration-1000 ${introPhase >= 1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            <p className="text-foreground/90 text-lg md:text-xl leading-relaxed font-medium italic">
+              {'"'}This one{"'"}s for you, Nicole.
+            </p>
+            <p className="text-foreground/80 text-lg md:text-xl leading-relaxed mt-4">
+              You{"'"}ve already built something Cleveland loves — now let{"'"}s make it even easier for them to come back.
+            </p>
+            <p className="text-primary text-xl md:text-2xl font-bold mt-6">
+              Welcome to Pop Culture CLE.
+            </p>
+          </div>
+
+          {/* Signature */}
+          <div className={`mt-12 transition-all duration-1000 delay-500 ${introPhase >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            <p className="text-foreground font-semibold text-lg">
+              — Upton Rand
+            </p>
+            <p className="text-secondary font-medium mt-1">
+              Alignment AI
+            </p>
+            <a 
+              href="mailto:Contact@alignment-ai.io" 
+              className="text-accent text-sm hover:underline mt-2 inline-block"
+            >
+              Contact@alignment-ai.io
+            </a>
+          </div>
+
+          {/* Continue button */}
+          <div className={`mt-16 transition-all duration-1000 delay-1000 ${introPhase >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            <button
+              onClick={handleIntroComplete}
+              className="px-8 py-3 bg-primary text-primary-foreground rounded-full font-semibold hover:bg-primary/90 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-primary/30"
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (showSplash) {
     return (
@@ -337,14 +408,15 @@ export default function SplashPage() {
           </button>
         </div>
 
-        {/* Product showcase */}
+        {/* Store showcase */}
         <div className="mt-10">
-          <h3 className="text-lg font-bold text-foreground mb-4 text-center">Your Products</h3>
-          <div className="grid grid-cols-3 gap-3">
+          <h3 className="text-lg font-bold text-foreground mb-4 text-center">Pop Culture CLE</h3>
+          <div className="grid grid-cols-2 gap-3">
             {[
-              { src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/c4d27db8-4d52-48b1-a5d2-ccc0160d0509.jpeg', alt: 'Colorful popsicle' },
-              { src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/a8db6a6b-90e0-4e76-aae4-d559eb291f50.jpeg', alt: 'Ice cream cones' },
-              { src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/81ccd041-ddbb-4a54-95b2-e2609a59427d.jpeg', alt: 'Storefront' },
+              { src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/4902868e-33d5-4d7b-9adf-25927ab0ba5e.jpeg', alt: 'Pop Culture CLE Logo' },
+              { src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/81ccd041-ddbb-4a54-95b2-e2609a59427d.jpeg', alt: 'Store Interior' },
+              { src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/c4d27db8-4d52-48b1-a5d2-ccc0160d0509.jpeg', alt: 'Collectibles Display' },
+              { src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/a8db6a6b-90e0-4e76-aae4-d559eb291f50.jpeg', alt: 'Pop Culture Products' },
             ].map((img, idx) => (
               <div 
                 key={idx} 
