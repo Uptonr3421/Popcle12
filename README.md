@@ -6,6 +6,12 @@ A modern loyalty application built with React, TypeScript, and Tailwind CSS, opt
 
 **Popcle12** is a loyalty application designed to help businesses manage customer rewards and engagement. The project is configured for seamless integration with Vercel and v0 by Vercel, enabling collaborative development through AI-assisted code generation and GitHub-based workflows.
 
+### Quick Links
+
+- **v0 Project**: [https://v0.app/chat/rGDFcrHa6iZ](https://v0.app/chat/rGDFcrHa6iZ)
+- **GitHub Repository**: [https://github.com/Uptonr3421/Popcle12](https://github.com/Uptonr3421/Popcle12)
+- **Vercel Project ID**: `prj_VVDatbRYlUGcSH6EgxUFhEMXhGxi`
+
 ## Tech Stack
 
 - **Frontend Framework**: React 19 with TypeScript
