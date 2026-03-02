@@ -21,6 +21,11 @@ export default function OffersPage() {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [nearStore, setNearStore] = useState(false);
   const [offersLoading, setOffersLoading] = useState(true);
+  const [distanceToStore, setDistanceToStore] = useState<number | null>(null);
+  const [wasNearStore, setWasNearStore] = useState(false);
+  const [claimingOfferId, setClaimingOfferId] = useState<string | null>(null);
+  const [claimedOffers, setClaimedOffers] = useState<Set<string>>(new Set());
+  const [claimMessage, setClaimMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -48,35 +53,47 @@ export default function OffersPage() {
         );
       });
 
-      const storeLatitude = 41.4384;
-      const storeLongitude = -81.4096;
-      const radiusKm = 0.5;
-
-      const R = 6371;
-      const dLat = ((position.latitude - storeLatitude) * Math.PI) / 180;
-      const dLon = ((position.longitude - storeLongitude) * Math.PI) / 180;
-      const a =
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos((storeLatitude * Math.PI) / 180) *
-          Math.cos((position.latitude * Math.PI) / 180) *
-          Math.sin(dLon / 2) *
-          Math.sin(dLon / 2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      const distance = R * c;
-
-      setNearStore(distance < radiusKm);
+      // Call the geofence API to track and check location
+      const action = !wasNearStore ? 'enter' : nearStore ? undefined : 'exit';
       
-      // Send push notification if entering store
-      if (distance < radiusKm && 'serviceWorker' in navigator) {
-        navigator.serviceWorker.ready.then(registration => {
-          registration.showNotification('Pop Culture CLE', {
-            body: 'You are near our store! Check out our special offers!',
-            icon: '/icon.svg',
-            badge: '/icon.svg',
-            tag: 'geofence-alert',
-            requireInteraction: false,
-          });
-        }).catch(err => console.log('Notification error:', err));
+      const response = await fetch('/api/geofence/trigger', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: user?.phone,
+          latitude: position.latitude,
+          longitude: position.longitude,
+          action,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const isNear = data.nearStore;
+        
+        setDistanceToStore(data.distance);
+        
+        // Track state changes for enter/exit triggers
+        if (isNear && !wasNearStore) {
+          setWasNearStore(true);
+          
+          // Send push notification when entering store area
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.ready.then(registration => {
+              registration.showNotification('Pop Culture CLE', {
+                body: 'You are near our store! Check out our special offers!',
+                icon: '/icon.svg',
+                badge: '/icon.svg',
+                tag: 'geofence-alert',
+                requireInteraction: false,
+              });
+            }).catch(err => console.log('Notification error:', err));
+          }
+        } else if (!isNear && wasNearStore) {
+          setWasNearStore(false);
+        }
+        
+        setNearStore(isNear);
       }
     } catch (err) {
       setNearStore(false);
@@ -101,6 +118,39 @@ export default function OffersPage() {
   const handleLogout = () => {
     logout();
     router.push('/');
+  };
+
+  const handleClaimOffer = async (offerId: string) => {
+    if (!user?.phone || !nearStore) return;
+    
+    setClaimingOfferId(offerId);
+    setClaimMessage(null);
+    
+    try {
+      const response = await fetch('/api/offers/redeem', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          phone: user.phone, 
+          offerId,
+          action: 'redeem' 
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setClaimMessage({ type: 'success', text: data.message || 'Offer claimed successfully!' });
+        setClaimedOffers(prev => new Set(prev).add(offerId));
+        setTimeout(() => setClaimMessage(null), 5000);
+      } else {
+        setClaimMessage({ type: 'error', text: data.error || 'Failed to claim offer' });
+      }
+    } catch (err) {
+      setClaimMessage({ type: 'error', text: 'Something went wrong. Please try again.' });
+    } finally {
+      setClaimingOfferId(null);
+    }
   };
 
   if (loading) {
@@ -157,6 +207,11 @@ export default function OffersPage() {
                 <span className="text-2xl animate-bounce">📍</span>
                 You're near Pop Culture CLE! All offers are active!
               </p>
+              {distanceToStore && (
+                <p className="text-sm text-secondary/80 text-center mt-2">
+                  {distanceToStore < 100 ? "You're at the store!" : `${distanceToStore}m away`}
+                </p>
+              )}
             </div>
           ) : (
             <div className="card-vibrant bg-gradient-to-r from-border to-border/50 p-6 border-2 border-border/50 text-center">
@@ -164,6 +219,22 @@ export default function OffersPage() {
                 <span className="text-xl">📍</span>
                 Enable location to see offers near our store
               </p>
+              {distanceToStore && (
+                <p className="text-sm text-foreground/60 mt-2">
+                  You're {(distanceToStore / 1000).toFixed(1)}km from our store
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Claim Message */}
+          {claimMessage && (
+            <div className={`card-vibrant p-4 text-center animate-bounce-in ${
+              claimMessage.type === 'success' 
+                ? 'bg-green-50 border-green-300 text-green-700' 
+                : 'bg-red-50 border-red-300 text-red-700'
+            }`}>
+              <p className="font-bold">{claimMessage.text}</p>
             </div>
           )}
 
@@ -212,9 +283,19 @@ export default function OffersPage() {
                     </div>
                     
                     {nearStore ? (
-                      <button className="w-full btn-secondary-glow shadow-lg">
-                        Claim Offer
-                      </button>
+                      claimedOffers.has(offer.id) ? (
+                        <div className="w-full px-4 py-3 bg-green-100 text-green-700 rounded-lg font-semibold text-center text-sm border border-green-300">
+                          Claimed!
+                        </div>
+                      ) : (
+                        <button 
+                          onClick={() => handleClaimOffer(offer.id)}
+                          disabled={claimingOfferId === offer.id}
+                          className="w-full btn-secondary-glow shadow-lg disabled:opacity-50"
+                        >
+                          {claimingOfferId === offer.id ? 'Claiming...' : 'Claim Offer'}
+                        </button>
+                      )
                     ) : (
                       <div className="w-full px-4 py-3 bg-muted text-muted-foreground rounded-lg font-semibold text-center text-sm">
                         Visit store to redeem

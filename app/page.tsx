@@ -48,9 +48,9 @@ export default function Home() {
             {/* Product Image Grid */}
             <div className="mb-12 grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 max-w-3xl mx-auto">
               {[
-                { src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/f448500b-11ef-4260-adfe-519e013d51b4.jpeg', alt: 'Delicious ice cream cones on tiered display' },
-                { src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/f18f42a3-dfa2-434d-84e0-de445bd2b893.jpeg', alt: 'Ice cream cone with colorful Fruity Pebbles toppings' },
-                { src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/0f959b41-d455-476b-9f09-d387394e16a1.jpeg', alt: 'Pop Culture CLE branded container - Handcrafted Dessert Shop' },
+                { src: '/images/cones.jpg', alt: 'Delicious ice cream cones on tiered display' },
+                { src: '/images/fruity-pebbles.jpg', alt: 'Ice cream cone with colorful Fruity Pebbles toppings' },
+                { src: '/images/branded-container.jpg', alt: 'Pop Culture CLE branded container - Handcrafted Dessert Shop' },
               ].map((product, idx) => (
                 <div key={idx} className="relative group rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 h-40 md:h-56 cursor-pointer">
                   <img 
@@ -101,16 +101,42 @@ export default function Home() {
           <div className="max-w-4xl mx-auto">
             <h2 className="font-sans text-3xl md:text-4xl font-bold text-center mb-12">Visit Us Today</h2>
             
-            <div className="card-vibrant overflow-hidden bg-white shadow-xl hover:shadow-2xl transition-shadow">
-              {/* Location Image */}
-              <div className="relative h-48 md:h-64 overflow-hidden">
-                <img 
-                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/81ccd041-ddbb-4a54-95b2-e2609a59427d.jpeg"
-                  alt="Pop Culture CLE storefront"
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Storefront Card */}
+              <div className="card-vibrant overflow-hidden bg-white shadow-xl hover:shadow-2xl transition-shadow">
+                <div className="relative h-48 md:h-64 overflow-hidden">
+                  <img 
+                    src="/images/storefront.jpg"
+                    alt="Pop Culture CLE storefront"
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                  <div className="absolute bottom-4 left-4 text-white">
+                    <p className="font-bold text-lg">Our Store</p>
+                    <p className="text-sm opacity-90">Solon, OH</p>
+                  </div>
+                </div>
               </div>
+
+              {/* Patio Card */}
+              <div className="card-vibrant overflow-hidden bg-white shadow-xl hover:shadow-2xl transition-shadow">
+                <div className="relative h-48 md:h-64 overflow-hidden">
+                  <img 
+                    src="/images/patio.jpg"
+                    alt="Pop Culture CLE outdoor patio seating"
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                  <div className="absolute bottom-4 left-4 text-white">
+                    <p className="font-bold text-lg">Outdoor Seating</p>
+                    <p className="text-sm opacity-90">Cozy patio vibes</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Location Details Card */}
+            <div className="card-vibrant overflow-hidden bg-white shadow-xl hover:shadow-2xl transition-shadow mt-6">
 
               {/* Location Info */}
               <div className="p-6 md:p-8">
@@ -151,6 +177,27 @@ export default function Home() {
                 </div>
               </div>
             </div>
+
+            {/* Map Image */}
+            <div className="card-vibrant overflow-hidden bg-white shadow-xl mt-6">
+              <div className="relative h-48 md:h-64 overflow-hidden">
+                <img 
+                  src="/images/map.jpg"
+                  alt="Pop Culture CLE location map - 33549 Solon Rd, Solon, OH"
+                  className="w-full h-full object-cover"
+                />
+                <a 
+                  href="https://maps.google.com/?q=33549+Solon+Rd,+Solon,+OH+44139"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/40 transition-colors"
+                >
+                  <span className="px-6 py-3 bg-white/90 rounded-lg font-bold text-primary hover:bg-white transition-colors">
+                    Get Directions
+                  </span>
+                </a>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -159,9 +206,15 @@ export default function Home() {
           <p className="text-sm text-foreground/60 mb-2">
             Pop Culture CLE © 2026 | Premium Handcrafted Desserts
           </p>
-          <p className="text-xs text-foreground/50">
+          <p className="text-xs text-foreground/50 mb-4">
             Loyalty App v1.0 | Mobile-First Design | Web & iPhone Ready
           </p>
+          <Link 
+            href="/admin" 
+            className="text-xs text-foreground/40 hover:text-primary transition-colors"
+          >
+            Admin Dashboard
+          </Link>
         </footer>
       </div>
     </div>

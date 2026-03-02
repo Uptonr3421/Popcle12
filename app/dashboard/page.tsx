@@ -19,6 +19,10 @@ export default function DashboardPage() {
   const [userName, setUserName] = useState('');
   const [showQR, setShowQR] = useState(true);
   const [nearStore, setNearStore] = useState(false);
+  const [wasNearStore, setWasNearStore] = useState(false);
+  const [distanceToStore, setDistanceToStore] = useState<number | null>(null);
+  const [claimLoading, setClaimLoading] = useState(false);
+  const [claimMessage, setClaimMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -60,24 +64,35 @@ export default function DashboardPage() {
         );
       });
 
-      // Solon, OH: 33549 Solon Rd (41.4384° N, 81.4096° W)
-      const storeLatitude = 41.4384;
-      const storeLongitude = -81.4096;
-      const radiusKm = 0.5; // 500 meters
+      // Call the geofence API to track and check location
+      const action = !wasNearStore ? 'enter' : nearStore ? undefined : 'exit';
+      
+      const response = await fetch('/api/geofence/trigger', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: user?.phone,
+          latitude: position.latitude,
+          longitude: position.longitude,
+          action,
+        }),
+      });
 
-      const R = 6371;
-      const dLat = ((position.latitude - storeLatitude) * Math.PI) / 180;
-      const dLon = ((position.longitude - storeLongitude) * Math.PI) / 180;
-      const a =
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos((storeLatitude * Math.PI) / 180) *
-          Math.cos((position.latitude * Math.PI) / 180) *
-          Math.sin(dLon / 2) *
-          Math.sin(dLon / 2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      const distance = R * c;
-
-      setNearStore(distance < radiusKm);
+      if (response.ok) {
+        const data = await response.json();
+        const isNear = data.nearStore;
+        
+        setDistanceToStore(data.distance);
+        
+        // Track state changes for enter/exit triggers
+        if (isNear && !wasNearStore) {
+          setWasNearStore(true);
+        } else if (!isNear && wasNearStore) {
+          setWasNearStore(false);
+        }
+        
+        setNearStore(isNear);
+      }
     } catch (err) {
       setNearStore(false);
     }
@@ -86,6 +101,39 @@ export default function DashboardPage() {
   const handleLogout = () => {
     logout();
     router.push('/');
+  };
+
+  const handleClaimReward = async () => {
+    if (!user?.phone || stampCount < 10) return;
+    
+    setClaimLoading(true);
+    setClaimMessage(null);
+    
+    try {
+      const response = await fetch('/api/loyalty/claim-reward', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: user.phone }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setClaimMessage({ type: 'success', text: data.message });
+        setStampCount(0);
+        // Refresh stamp count after a delay
+        setTimeout(() => {
+          fetchStampCount();
+          setClaimMessage(null);
+        }, 5000);
+      } else {
+        setClaimMessage({ type: 'error', text: data.error || 'Failed to claim reward' });
+      }
+    } catch (err) {
+      setClaimMessage({ type: 'error', text: 'Something went wrong. Please try again.' });
+    } finally {
+      setClaimLoading(false);
+    }
   };
 
   if (loading) {
@@ -147,6 +195,18 @@ export default function DashboardPage() {
                 <span className="text-2xl animate-bounce">📍</span>
                 You're near Pop Culture CLE! Check offers and special deals!
               </p>
+              {distanceToStore && (
+                <p className="text-sm text-secondary/80 text-center mt-2">
+                  {distanceToStore < 100 ? "You're at the store!" : `${distanceToStore}m away`}
+                </p>
+              )}
+              <div className="mt-4 flex justify-center">
+                <Link href="/offers">
+                  <button className="btn-secondary-glow text-sm px-6">
+                    View Special Offers
+                  </button>
+                </Link>
+              </div>
             </section>
           )}
 
@@ -233,9 +293,24 @@ export default function DashboardPage() {
 
             {/* Action Buttons */}
             <div className="space-y-3">
-              {isReady && (
-                <button className="btn-accent-glow w-full shadow-lg animate-bounce-in">
-                  🎁 Claim Free Item
+              {/* Claim Message */}
+              {claimMessage && (
+                <div className={`p-4 rounded-lg text-center animate-bounce-in ${
+                  claimMessage.type === 'success' 
+                    ? 'bg-green-50 border border-green-300 text-green-700' 
+                    : 'bg-red-50 border border-red-300 text-red-700'
+                }`}>
+                  <p className="font-bold">{claimMessage.text}</p>
+                </div>
+              )}
+
+              {isReady && !claimMessage && (
+                <button 
+                  onClick={handleClaimReward}
+                  disabled={claimLoading}
+                  className="btn-accent-glow w-full shadow-lg animate-bounce-in disabled:opacity-50"
+                >
+                  {claimLoading ? 'Claiming...' : '🎁 Claim Free Item'}
                 </button>
               )}
               <button 
@@ -273,31 +348,52 @@ export default function DashboardPage() {
           )}
 
           {/* Store Info Section */}
-          <section className="card-vibrant bg-gradient-to-br from-accent/10 to-secondary/10 p-8 text-center border border-border/50">
-            <h3 className="text-xl font-sans font-bold mb-4">Visit Our Store</h3>
-            <p className="text-foreground/70 mb-6 text-lg font-semibold">
-              📍 33549 Solon Rd, Solon, OH 44139
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <a
-                href="tel:+12162457316"
-                className="px-6 py-3 bg-gradient-to-r from-accent to-orange-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-accent/50 transition-all hover:scale-105"
-              >
-                📞 Call: (216) 245-7316
-              </a>
-              <a
-                href="mailto:info@popculturecle.com"
-                className="px-6 py-3 bg-gradient-to-r from-secondary to-teal-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-secondary/50 transition-all hover:scale-105"
-              >
-                📧 Email Us
-              </a>
+          <section className="card-vibrant bg-white overflow-hidden border border-border/50">
+            <div className="relative h-40 overflow-hidden">
+              <img 
+                src="/images/patio.jpg"
+                alt="Pop Culture CLE outdoor seating"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+              <div className="absolute bottom-4 left-4 text-white">
+                <h3 className="text-xl font-sans font-bold">Visit Our Store</h3>
+              </div>
+            </div>
+            <div className="p-6 text-center">
+              <p className="text-foreground/70 mb-4 text-lg font-semibold">
+                📍 33549 Solon Rd, Solon, OH 44139
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <a
+                  href="tel:+12162457316"
+                  className="px-6 py-3 bg-gradient-to-r from-accent to-orange-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-accent/50 transition-all hover:scale-105"
+                >
+                  📞 Call: (216) 245-7316
+                </a>
+                <a
+                  href="https://maps.google.com/?q=33549+Solon+Rd,+Solon,+OH+44139"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-6 py-3 bg-gradient-to-r from-secondary to-teal-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-secondary/50 transition-all hover:scale-105"
+                >
+                  📍 Get Directions
+                </a>
+              </div>
             </div>
           </section>
 
-          {/* Footer */}
-          <div className="text-center text-sm text-foreground/60">
-            <Link href="/" className="text-primary hover:text-secondary transition-colors font-medium">
-              ← Back to Home
+          {/* Quick Links */}
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link href="/offers">
+              <button className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-accent/20 to-secondary/20 rounded-lg font-semibold text-foreground hover:shadow-lg transition-all hover:scale-105 border border-border/50">
+                🎁 View Special Offers
+              </button>
+            </Link>
+            <Link href="/">
+              <button className="w-full sm:w-auto px-6 py-3 bg-white rounded-lg font-semibold text-foreground/70 hover:shadow-lg transition-all hover:scale-105 border border-border/50">
+                ← Back to Home
+              </button>
             </Link>
           </div>
         </div>
