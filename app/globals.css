@@ -360,22 +360,22 @@
     animation: bounce-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
-  /* Button styles */
+  /* Button styles - base styles inlined to avoid @apply circular reference */
   .btn-vibrant {
     @apply px-6 py-3 rounded-lg font-semibold transition-all duration-200 hover:shadow-lg hover:scale-105 active:scale-95 text-base min-h-[44px];
   }
 
   .btn-primary-glow {
-    @apply btn-vibrant bg-gradient-to-r from-primary to-secondary text-primary-foreground hover:shadow-lg hover:shadow-primary/50;
+    @apply px-6 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 active:scale-95 text-base min-h-[44px] bg-gradient-to-r from-primary to-secondary text-primary-foreground hover:shadow-lg hover:shadow-primary/50;
   }
 
   .btn-accent-glow {
-    @apply btn-vibrant text-accent-foreground hover:shadow-lg hover:shadow-accent/50;
+    @apply px-6 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 active:scale-95 text-base min-h-[44px] text-accent-foreground hover:shadow-lg hover:shadow-accent/50;
     background: linear-gradient(to right, var(--accent), #f97316);
   }
 
   .btn-secondary-glow {
-    @apply btn-vibrant bg-gradient-to-r from-secondary to-accent text-secondary-foreground hover:shadow-lg hover:shadow-secondary/50;
+    @apply px-6 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 active:scale-95 text-base min-h-[44px] bg-gradient-to-r from-secondary to-accent text-secondary-foreground hover:shadow-lg hover:shadow-secondary/50;
   }
 
   /* Card enhancement */
