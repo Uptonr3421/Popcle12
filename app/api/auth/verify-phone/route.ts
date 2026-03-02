@@ -20,8 +20,8 @@ export async function POST(req: NextRequest) {
     // Check if user exists
     const { data: user, error: queryError } = await supabase
       .from('users')
-      .select('phone_number')
-      .eq('phone_number', phone)
+      .select('phone')
+      .eq('phone', phone)
       .single();
 
     if (queryError && queryError.code !== 'PGRST116') {

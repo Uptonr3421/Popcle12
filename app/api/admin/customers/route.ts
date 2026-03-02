@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
   try {
     const { data: users, error } = await supabase
       .from('users')
-      .select('id, phone_number, name, stamp_count, loyalty_status, created_at')
+      .select('id, phone, name, stamp_count, user_type, created_at')
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -19,10 +19,10 @@ export async function GET(req: NextRequest) {
 
     const customers = (users || []).map((user: any) => ({
       id: user.id,
-      phone: user.phone_number,
+      phone: user.phone,
       name: user.name,
       stampCount: user.stamp_count || 0,
-      userType: user.loyalty_status || 'customer',
+      userType: user.user_type || 'customer',
       createdAt: user.created_at,
     }));
 

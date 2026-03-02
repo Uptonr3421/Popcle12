@@ -1,11 +1,12 @@
 import type { Metadata } from 'next'
-import { Poppins, Geist_Mono } from 'next/font/google'
+import { Geist, Geist_Mono, Poppins } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 import PWASetup from '@/components/pwa-setup'
 
-const _poppins = Poppins({ weight: ['400', '500', '600', '700'], subsets: ["latin"], variable: '--font-sans' });
-const _geistMono = Geist_Mono({ subsets: ["latin"], variable: '--font-mono' });
+const _geist = Geist({ subsets: ["latin"] });
+const _geistMono = Geist_Mono({ subsets: ["latin"] });
+const _poppins = Poppins({ weight: ['400', '500', '600', '700'], subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: 'Pop Culture CLE Loyalty - Earn Stamps, Get Free Ice Cream',
@@ -58,7 +59,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Pop Culture CLE" />
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
-      <body className={`${_poppins.variable} ${_geistMono.variable} font-sans antialiased`}>
+      <body className="font-sans antialiased">
         <PWASetup />
         {children}
         <Analytics />

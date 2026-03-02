@@ -2,15 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
+import QRCode from 'qrcode.react';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-
-const QRCode = dynamic(() => import('qrcode.react').then((mod) => mod.QRCodeCanvas), {
-  ssr: false,
-  loading: () => <div className="w-64 h-64 bg-muted rounded-lg animate-pulse mx-auto" />,
-});
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -117,7 +112,7 @@ export default function DashboardPage() {
         {/* Header */}
         <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-border/50 shadow-sm">
           <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-            <Link href="/" className="text-2xl font-sans font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary hover:opacity-80 transition-opacity">
+            <Link href="/" className="text-2xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary hover:opacity-80 transition-opacity">
               Pop Culture CLE
             </Link>
             <button
@@ -133,7 +128,7 @@ export default function DashboardPage() {
         <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
           {/* Welcome Section */}
           <section className="text-center">
-            <h1 className="text-4xl md:text-5xl font-sans font-bold mb-2">
+            <h1 className="text-4xl md:text-5xl font-display font-bold mb-2">
               Welcome, <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">{userName}</span>!
             </h1>
             <p className="text-lg text-foreground/70">Your loyalty account is active</p>
@@ -192,7 +187,7 @@ export default function DashboardPage() {
 
                   {/* Center Content */}
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-5xl md:text-6xl font-sans font-bold text-primary">{stampCount}</span>
+                    <span className="text-5xl md:text-6xl font-display font-bold text-primary">{stampCount}</span>
                     <span className="text-lg font-semibold text-foreground/70 mt-1">/ 10 Stamps</span>
                   </div>
                 </div>
@@ -216,7 +211,7 @@ export default function DashboardPage() {
                 {Array.from({ length: 10 }).map((_, idx) => (
                   <div
                     key={idx}
-                    className={`w-10 h-10 md:w-12 md:h-12 rounded-lg font-sans font-bold text-lg flex items-center justify-center transition-all transform ${
+                    className={`w-10 h-10 md:w-12 md:h-12 rounded-lg font-display font-bold text-lg flex items-center justify-center transition-all transform ${
                       idx < stampCount
                         ? 'bg-gradient-to-br from-secondary to-teal-500 text-white scale-110 shadow-lg'
                         : 'bg-border text-foreground/40'
@@ -250,7 +245,7 @@ export default function DashboardPage() {
           {/* QR Code Section */}
           {showQR && (
             <section className="card-vibrant bg-white p-8 md:p-12 text-center shadow-2xl animate-bounce-in">
-              <h2 className="text-2xl font-sans font-bold mb-2">Your Loyalty QR Code</h2>
+              <h2 className="text-2xl font-display font-bold mb-2">Your Loyalty QR Code</h2>
               <p className="text-foreground/70 mb-8">Show this to staff to add stamps to your account</p>
 
               {/* Ornate QR Frame */}
@@ -260,6 +255,10 @@ export default function DashboardPage() {
                     <QRCode
                       value={user.phone}
                       size={256}
+                      level="H"
+                      includeMargin={true}
+                      fgColor="#8B3A62"
+                      bgColor="#FFFFFF"
                     />
                   </div>
                   <p className="text-sm font-semibold text-primary mt-4 uppercase tracking-wider">Scan to Add Stamps</p>
@@ -274,7 +273,7 @@ export default function DashboardPage() {
 
           {/* Store Info Section */}
           <section className="card-vibrant bg-gradient-to-br from-accent/10 to-secondary/10 p-8 text-center border border-border/50">
-            <h3 className="text-xl font-sans font-bold mb-4">Visit Our Store</h3>
+            <h3 className="text-xl font-display font-bold mb-4">Visit Our Store</h3>
             <p className="text-foreground/70 mb-6 text-lg font-semibold">
               📍 33549 Solon Rd, Solon, OH 44139
             </p>

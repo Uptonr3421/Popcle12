@@ -142,7 +142,7 @@ export default function AdminDashboard() {
 
         <div className="relative z-10 w-full max-w-md">
           <div className="text-center mb-10">
-            <h1 className="text-5xl font-sans font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent mb-2">
+            <h1 className="text-5xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent mb-2">
               Pop Culture CLE
             </h1>
             <p className="text-lg text-foreground/70 font-medium">Admin Dashboard</p>
@@ -203,7 +203,7 @@ export default function AdminDashboard() {
         {/* Header */}
         <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-border/50 shadow-sm">
           <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-            <h1 className="text-2xl font-sans font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
+            <h1 className="text-2xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
               Admin Dashboard
             </h1>
             <button
@@ -238,7 +238,7 @@ export default function AdminDashboard() {
           {/* Overview Tab */}
           {activeTab === 'overview' && stats && (
             <div className="space-y-6">
-              <h2 className="text-3xl font-sans font-bold">Business Analytics</h2>
+              <h2 className="text-3xl font-display font-bold">Business Analytics</h2>
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
                   { label: 'Total Customers', value: stats.totalCustomers, icon: '👥' },
@@ -249,7 +249,7 @@ export default function AdminDashboard() {
                   <div key={stat.label} className="card-vibrant bg-white p-6 shadow-lg text-center">
                     <div className="text-4xl mb-3">{stat.icon}</div>
                     <p className="text-foreground/70 text-sm font-medium mb-2">{stat.label}</p>
-                    <p className="text-4xl font-sans font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
+                    <p className="text-4xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
                       {stat.value}
                     </p>
                   </div>
@@ -261,7 +261,7 @@ export default function AdminDashboard() {
           {/* Customers Tab */}
           {activeTab === 'customers' && (
             <div className="space-y-6">
-              <h2 className="text-3xl font-sans font-bold">Loyal Customers</h2>
+              <h2 className="text-3xl font-display font-bold">Loyal Customers</h2>
               {customers.length > 0 ? (
                 <div className="card-vibrant bg-white overflow-x-auto shadow-lg rounded-2xl">
                   <table className="w-full">
@@ -312,11 +312,11 @@ export default function AdminDashboard() {
           {/* Offers Tab */}
           {activeTab === 'offers' && (
             <div className="space-y-8">
-              <h2 className="text-3xl font-sans font-bold">Manage Offers</h2>
+              <h2 className="text-3xl font-display font-bold">Manage Offers</h2>
 
               {/* Create New Offer */}
               <div className="card-vibrant bg-white p-8 shadow-lg">
-                <h3 className="text-xl font-sans font-bold mb-6">Create New Offer</h3>
+                <h3 className="text-xl font-display font-bold mb-6">Create New Offer</h3>
                 <form onSubmit={handleCreateOffer} className="space-y-4">
                   <div>
                     <label className="block text-sm font-semibold text-foreground mb-2">Offer Title</label>
@@ -374,7 +374,7 @@ export default function AdminDashboard() {
 
               {/* Active Offers */}
               <div>
-                <h3 className="text-xl font-sans font-bold mb-4">Active Offers</h3>
+                <h3 className="text-xl font-display font-bold mb-4">Active Offers</h3>
                 {offers.length > 0 ? (
                   <div className="grid md:grid-cols-2 gap-6">
                     {offers.map((offer) => (

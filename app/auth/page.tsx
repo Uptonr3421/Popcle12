@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
-function AuthForm() {
+export default function AuthPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isEmployee = searchParams.get('mode') === 'employee';
@@ -113,7 +113,7 @@ function AuthForm() {
         {/* Logo/Header */}
         <div className="text-center mb-10">
           <Link href="/" className="inline-block mb-4 hover:opacity-80 transition-opacity">
-            <h1 className="text-4xl md:text-5xl font-sans font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent">
+            <h1 className="text-4xl md:text-5xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent">
               Pop Culture CLE
             </h1>
           </Link>
@@ -234,23 +234,11 @@ function AuthForm() {
 
         {/* Security Footer */}
         <div className="mt-8 space-y-2 text-center text-xs text-foreground/60">
-          <p className="font-medium">Secure & Private</p>
+          <p className="font-medium">🔒 Secure & Private</p>
           <p>Your data is encrypted and never shared</p>
           <p className="text-foreground/50">Pop Culture CLE © 2026</p>
         </div>
       </div>
     </main>
-  );
-}
-
-export default function AuthPage() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-b from-background via-orange-50 to-background flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-      </div>
-    }>
-      <AuthForm />
-    </Suspense>
   );
 }

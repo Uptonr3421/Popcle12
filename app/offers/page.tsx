@@ -128,7 +128,7 @@ export default function OffersPage() {
         {/* Header */}
         <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-border/50 shadow-sm">
           <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-            <Link href="/" className="text-2xl font-sans font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary hover:opacity-80 transition-opacity">
+            <Link href="/" className="text-2xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary hover:opacity-80 transition-opacity">
               Pop Culture CLE
             </Link>
             <button
@@ -144,7 +144,7 @@ export default function OffersPage() {
         <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
           {/* Title */}
           <section className="text-center">
-            <h1 className="text-4xl md:text-5xl font-sans font-bold mb-2">
+            <h1 className="text-4xl md:text-5xl font-display font-bold mb-2">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-secondary">Special Offers</span>
             </h1>
             <p className="text-lg text-foreground/70">Exclusive deals for our loyal customers</p>
@@ -188,10 +188,10 @@ export default function OffersPage() {
                   <div className="p-6 bg-gradient-to-r from-accent/20 to-secondary/20">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
-                        <h3 className="text-2xl font-sans font-bold text-foreground mb-1">
+                        <h3 className="text-2xl font-display font-bold text-foreground mb-1">
                           {offer.title}
                         </h3>
-                        <div className="text-4xl font-sans font-bold text-accent mb-2">
+                        <div className="text-4xl font-display font-bold text-accent mb-2">
                           {offer.discount}
                         </div>
                       </div>
@@ -236,7 +236,7 @@ export default function OffersPage() {
 
           {/* Info Section */}
           <section className="card-vibrant bg-gradient-to-br from-primary/10 to-secondary/10 p-8 text-center border border-border/50">
-            <h3 className="text-xl font-sans font-bold mb-4">How Offers Work</h3>
+            <h3 className="text-xl font-display font-bold mb-4">How Offers Work</h3>
             <ol className="space-y-3 text-sm text-foreground/80 text-left max-w-md mx-auto">
               <li className="flex gap-3">
                 <span className="font-bold text-primary flex-shrink-0">1.</span>

@@ -20,8 +20,8 @@ export async function POST(req: NextRequest) {
     // Get customer
     const { data: customer, error: customerError } = await supabase
       .from('users')
-      .select('id, name, stamp_count, loyalty_status')
-      .eq('phone_number', customerPhone)
+      .select('id, name, stamp_count, user_type')
+      .eq('phone', customerPhone)
       .single();
 
     if (customerError || !customer) {
@@ -34,11 +34,11 @@ export async function POST(req: NextRequest) {
     // Verify employee
     const { data: employee, error: employeeError } = await supabase
       .from('users')
-      .select('id, loyalty_status, phone_number')
-      .eq('phone_number', employeePhone)
+      .select('id, user_type')
+      .eq('phone', employeePhone)
       .single();
 
-    if (employeeError || !employee || employee.loyalty_status !== 'employee') {
+    if (employeeError || !employee || employee.user_type !== 'employee') {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 403 }
@@ -63,9 +63,10 @@ export async function POST(req: NextRequest) {
       .from('loyalty_records')
       .insert([
         {
-          user_id: customer.id,
-          scanned_by_employee: employee.phone_number,
-          stamp_added_at: new Date().toISOString(),
+          customer_id: customer.id,
+          employee_id: employee.id,
+          action: 'stamp_added',
+          created_at: new Date().toISOString(),
         },
       ]);
 

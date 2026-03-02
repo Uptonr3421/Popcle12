@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
       id: offer.id,
       title: offer.title,
       description: offer.description,
-      discount: offer.free_item ? 'FREE ITEM' : `${offer.discount_percentage || 0}% Off`,
+      discount: offer.discount,
       expiresAt: offer.expires_at,
       active: offer.active,
     }));
