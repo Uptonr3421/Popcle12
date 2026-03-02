@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
-export default function AuthPage() {
+function AuthContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isEmployee = searchParams.get('mode') === 'employee';
@@ -241,5 +241,26 @@ export default function AuthPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+// Loading fallback for Suspense
+function AuthLoading() {
+  return (
+    <main className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="text-center">
+        <div className="animate-spin text-4xl mb-4">...</div>
+        <p className="text-muted-foreground font-medium">Loading...</p>
+      </div>
+    </main>
+  );
+}
+
+// Main export wrapped in Suspense for useSearchParams
+export default function AuthPage() {
+  return (
+    <Suspense fallback={<AuthLoading />}>
+      <AuthContent />
+    </Suspense>
   );
 }
