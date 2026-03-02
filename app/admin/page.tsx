@@ -134,21 +134,21 @@ export default function AdminDashboard() {
 
   if (!isAuthenticated) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-background via-orange-50 to-background flex items-center justify-center p-4 relative overflow-hidden">
-        <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-50">
-          <div className="absolute top-0 right-1/4 w-96 h-96 bg-primary rounded-full mix-blend-multiply filter blur-3xl animate-float"></div>
-          <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-secondary rounded-full mix-blend-multiply filter blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
+      <main className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
+        <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-30">
+          <div className="absolute top-0 right-1/4 w-96 h-96 bg-primary/50 rounded-full filter blur-3xl animate-float"></div>
+          <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-secondary/50 rounded-full filter blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
         </div>
 
         <div className="relative z-10 w-full max-w-md">
           <div className="text-center mb-10">
-            <h1 className="text-5xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent mb-2">
+            <h1 className="text-5xl font-display font-bold text-primary animate-neon-pulse mb-2">
               Pop Culture CLE
             </h1>
-            <p className="text-lg text-foreground/70 font-medium">Admin Dashboard</p>
+            <p className="text-lg text-muted-foreground font-medium">Admin Dashboard</p>
           </div>
 
-          <div className="card-vibrant bg-white/95 backdrop-blur-md p-10 shadow-2xl border border-border/50">
+          <div className="card-vibrant bg-card backdrop-blur-md p-10 shadow-2xl border border-border">
             <form onSubmit={handleAdminLogin} className="space-y-6">
               <div>
                 <label htmlFor="admin-phone" className="block text-sm font-semibold text-foreground mb-3">
@@ -193,17 +193,17 @@ export default function AdminDashboard() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background via-orange-50 to-background pb-12">
-      <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-40">
-        <div className="absolute top-20 right-1/4 w-96 h-96 bg-primary rounded-full mix-blend-multiply filter blur-3xl animate-float"></div>
-        <div className="absolute bottom-40 left-1/4 w-96 h-96 bg-secondary rounded-full mix-blend-multiply filter blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
+    <main className="min-h-screen bg-background pb-12">
+      <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-30">
+        <div className="absolute top-20 right-1/4 w-96 h-96 bg-primary/50 rounded-full filter blur-3xl animate-float"></div>
+        <div className="absolute bottom-40 left-1/4 w-96 h-96 bg-secondary/50 rounded-full filter blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
       </div>
 
       <div className="relative z-10">
         {/* Header */}
-        <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-border/50 shadow-sm">
+        <header className="sticky top-0 z-20 bg-card/80 backdrop-blur-md border-b border-border shadow-sm">
           <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-            <h1 className="text-2xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
+            <h1 className="text-2xl font-display font-bold text-primary">
               Admin Dashboard
             </h1>
             <button
@@ -246,10 +246,10 @@ export default function AdminDashboard() {
                   { label: 'Rewards Redeemed', value: stats.rewardsRedeemed, icon: '🎁' },
                   { label: 'Active Offers', value: stats.activeOffers, icon: '🏷️' },
                 ].map((stat) => (
-                  <div key={stat.label} className="card-vibrant bg-white p-6 shadow-lg text-center">
+                  <div key={stat.label} className="card-vibrant bg-card p-6 shadow-lg text-center border border-border">
                     <div className="text-4xl mb-3">{stat.icon}</div>
-                    <p className="text-foreground/70 text-sm font-medium mb-2">{stat.label}</p>
-                    <p className="text-4xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
+                    <p className="text-muted-foreground text-sm font-medium mb-2">{stat.label}</p>
+                    <p className="text-4xl font-display font-bold text-primary">
                       {stat.value}
                     </p>
                   </div>
@@ -263,7 +263,7 @@ export default function AdminDashboard() {
             <div className="space-y-6">
               <h2 className="text-3xl font-display font-bold">Loyal Customers</h2>
               {customers.length > 0 ? (
-                <div className="card-vibrant bg-white overflow-x-auto shadow-lg rounded-2xl">
+                <div className="card-vibrant bg-card overflow-x-auto shadow-lg rounded-2xl border border-border">
                   <table className="w-full">
                     <thead className="bg-gradient-to-r from-primary/10 to-secondary/10 border-b border-border">
                       <tr>
@@ -302,8 +302,8 @@ export default function AdminDashboard() {
                   </table>
                 </div>
               ) : (
-                <div className="card-vibrant bg-white p-12 text-center">
-                  <p className="text-foreground/70 text-lg">No customers yet</p>
+                <div className="card-vibrant bg-card p-12 text-center border border-border">
+                  <p className="text-muted-foreground text-lg">No customers yet</p>
                 </div>
               )}
             </div>
@@ -315,7 +315,7 @@ export default function AdminDashboard() {
               <h2 className="text-3xl font-display font-bold">Manage Offers</h2>
 
               {/* Create New Offer */}
-              <div className="card-vibrant bg-white p-8 shadow-lg">
+              <div className="card-vibrant bg-card p-8 shadow-lg border border-border">
                 <h3 className="text-xl font-display font-bold mb-6">Create New Offer</h3>
                 <form onSubmit={handleCreateOffer} className="space-y-4">
                   <div>
@@ -378,12 +378,12 @@ export default function AdminDashboard() {
                 {offers.length > 0 ? (
                   <div className="grid md:grid-cols-2 gap-6">
                     {offers.map((offer) => (
-                      <div key={offer.id} className="card-vibrant bg-white p-6 shadow-lg">
+                      <div key={offer.id} className="card-vibrant bg-card p-6 shadow-lg border border-border">
                         <h4 className="text-lg font-bold text-primary mb-2">{offer.title}</h4>
                         <p className="text-foreground/80 mb-3">{offer.description}</p>
                         <div className="flex items-center justify-between">
                           <span className="text-2xl font-bold text-accent">{offer.discount}</span>
-                          <span className="text-sm text-foreground/60">
+                          <span className="text-sm text-muted-foreground">
                             Expires: {new Date(offer.expiresAt).toLocaleDateString()}
                           </span>
                         </div>
@@ -391,8 +391,8 @@ export default function AdminDashboard() {
                     ))}
                   </div>
                 ) : (
-                  <div className="card-vibrant bg-white p-12 text-center">
-                    <p className="text-foreground/70">No active offers yet</p>
+                  <div className="card-vibrant bg-card p-12 text-center border border-border">
+                    <p className="text-muted-foreground">No active offers yet</p>
                   </div>
                 )}
               </div>

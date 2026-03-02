@@ -105,10 +105,10 @@ export default function OffersPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-background via-orange-50 to-background flex items-center justify-center">
+      <main className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin text-4xl mb-4">⏳</div>
-          <p className="text-foreground/70 font-medium">Loading offers...</p>
+          <p className="text-muted-foreground font-medium">Loading offers...</p>
         </div>
       </main>
     );
@@ -117,23 +117,23 @@ export default function OffersPage() {
   if (!user) return null;
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background via-orange-50 to-background pb-8">
+    <main className="min-h-screen bg-background pb-8">
       {/* Animated background */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-40">
-        <div className="absolute top-20 right-1/4 w-96 h-96 bg-primary rounded-full mix-blend-multiply filter blur-3xl animate-float"></div>
-        <div className="absolute bottom-40 left-1/4 w-96 h-96 bg-secondary rounded-full mix-blend-multiply filter blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
+      <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-30">
+        <div className="absolute top-20 right-1/4 w-96 h-96 bg-primary/50 rounded-full filter blur-3xl animate-float"></div>
+        <div className="absolute bottom-40 left-1/4 w-96 h-96 bg-secondary/50 rounded-full filter blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
       </div>
 
       <div className="relative z-10">
         {/* Header */}
-        <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-border/50 shadow-sm">
+        <header className="sticky top-0 z-20 bg-card/80 backdrop-blur-md border-b border-border shadow-sm">
           <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-            <Link href="/" className="text-2xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary hover:opacity-80 transition-opacity">
+            <Link href="/" className="text-2xl font-display font-bold text-primary hover:opacity-80 transition-opacity">
               Pop Culture CLE
             </Link>
             <button
               onClick={handleLogout}
-              className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors px-3 py-1 rounded hover:bg-primary/10"
+              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors px-3 py-1 rounded hover:bg-primary/10"
             >
               Logout
             </button>
@@ -144,10 +144,10 @@ export default function OffersPage() {
         <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
           {/* Title */}
           <section className="text-center">
-            <h1 className="text-4xl md:text-5xl font-display font-bold mb-2">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-secondary">Special Offers</span>
+            <h1 className="text-4xl md:text-5xl font-display font-bold mb-2 text-primary">
+              Special Offers
             </h1>
-            <p className="text-lg text-foreground/70">Exclusive deals for our loyal customers</p>
+            <p className="text-lg text-muted-foreground">Exclusive deals for our loyal customers</p>
           </section>
 
           {/* Geofence Status */}
@@ -180,8 +180,8 @@ export default function OffersPage() {
                   key={offer.id}
                   className={`card-vibrant overflow-hidden shadow-xl hover:shadow-2xl transition-all transform hover:scale-105 ${
                     nearStore
-                      ? 'bg-gradient-to-br from-accent/10 to-secondary/10 border-2 border-secondary/50 animate-glow'
-                      : 'bg-white/50 border border-border/50 opacity-75'
+                      ? 'bg-gradient-to-br from-primary/20 to-secondary/20 border-2 border-primary/50 animate-glow'
+                      : 'bg-card border border-border opacity-75'
                   }`}
                 >
                   {/* Offer Header */}
@@ -225,9 +225,9 @@ export default function OffersPage() {
               ))}
             </div>
           ) : (
-            <div className="card-vibrant bg-white p-12 text-center">
+            <div className="card-vibrant bg-card p-12 text-center border border-border">
               <p className="text-2xl text-foreground/70 mb-4">No active offers right now</p>
-              <p className="text-foreground/60 mb-8">Check back soon for exciting deals!</p>
+              <p className="text-muted-foreground mb-8">Check back soon for exciting deals!</p>
               <Link href="/dashboard">
                 <Button className="btn-primary-glow">Back to Dashboard</Button>
               </Link>
@@ -235,7 +235,7 @@ export default function OffersPage() {
           )}
 
           {/* Info Section */}
-          <section className="card-vibrant bg-gradient-to-br from-primary/10 to-secondary/10 p-8 text-center border border-border/50">
+          <section className="card-vibrant bg-gradient-to-br from-primary/10 to-secondary/10 p-8 text-center border border-border">
             <h3 className="text-xl font-display font-bold mb-4">How Offers Work</h3>
             <ol className="space-y-3 text-sm text-foreground/80 text-left max-w-md mx-auto">
               <li className="flex gap-3">
