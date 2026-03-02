@@ -10,16 +10,12 @@ export async function POST(req: NextRequest) {
   try {
     const { title, description, discount, expiresAt } = await req.json();
 
-    if (!title || !description || !expiresAt) {
+    if (!title || !description || !discount || !expiresAt) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
       );
     }
-
-    // Parse discount — if it looks like a number treat as percentage, otherwise set free_item
-    const discountNum = parseInt(discount, 10);
-    const isFreeItem = isNaN(discountNum) || discount?.toLowerCase().includes('free');
 
     const { data: offer, error } = await supabase
       .from('offers')
@@ -27,8 +23,7 @@ export async function POST(req: NextRequest) {
         {
           title,
           description,
-          discount_percentage: isFreeItem ? 0 : discountNum,
-          free_item: isFreeItem,
+          discount,
           expires_at: expiresAt,
           active: true,
           created_at: new Date().toISOString(),
@@ -47,7 +42,7 @@ export async function POST(req: NextRequest) {
         id: offer.id,
         title: offer.title,
         description: offer.description,
-        discount: offer.free_item ? 'FREE ITEM' : `${offer.discount_percentage}% Off`,
+        discount: offer.discount,
         expiresAt: offer.expires_at,
         active: offer.active,
       },

@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     const { data: existingUser } = await supabase
       .from('users')
       .select('id')
-      .eq('phone_number', phone)
+      .eq('phone', phone)
       .single();
 
     if (existingUser) {
@@ -34,9 +34,9 @@ export async function POST(request: NextRequest) {
       .from('users')
       .insert([
         {
-          phone_number: phone,
+          phone,
           name: name.trim(),
-          loyalty_status: isEmployee ? 'employee' : 'customer',
+          user_type: isEmployee ? 'employee' : 'customer',
           stamp_count: 0,
           created_at: new Date().toISOString(),
         },
@@ -52,10 +52,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       user: {
         id: newUser.id,
-        phone: newUser.phone_number,
+        phone: newUser.phone,
         name: newUser.name,
         stamps: newUser.stamp_count,
-        type: newUser.loyalty_status,
+        type: newUser.user_type,
       },
     });
   } catch (error) {

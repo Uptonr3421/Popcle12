@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
     const { data: user, error } = await supabase
       .from('users')
       .select('stamp_count')
-      .eq('phone_number', phone)
+      .eq('phone', phone)
       .single();
 
     if (error || !user) {

@@ -2,12 +2,10 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { Html5QrcodeScanner } from 'html5-qrcode';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-
-// Html5QrcodeScanner type placeholder for dynamic import
-type Html5QrcodeScannerType = any;
 
 export default function ScanPage() {
   const router = useRouter();
@@ -16,7 +14,7 @@ export default function ScanPage() {
   const [scannedName, setScannedName] = useState<string>('');
   const [loading2, setLoading2] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const scannerRef = useRef<Html5QrcodeScannerType | null>(null);
+  const scannerRef = useRef<Html5QrcodeScanner | null>(null);
   const [isScannerActive, setIsScannerActive] = useState(true);
 
   useEffect(() => {
@@ -27,16 +25,6 @@ export default function ScanPage() {
 
   useEffect(() => {
     if (!isScannerActive || !user) return;
-
-    // Load html5-qrcode dynamically on client only
-    import('html5-qrcode').then((mod) => {
-      const Html5QrcodeScanner = mod.Html5QrcodeScanner;
-      initScanner(Html5QrcodeScanner);
-    });
-  }, [isScannerActive, user]);
-
-  const initScanner = (Html5QrcodeScanner: any) => {
-    if (!Html5QrcodeScanner) return;
 
     const scanner = new Html5QrcodeScanner(
       'qr-reader',
@@ -103,7 +91,7 @@ export default function ScanPage() {
         scannerRef.current.clear();
       }
     };
-  };
+  }, [isScannerActive, user]);
 
   const handleLogout = () => {
     logout();
@@ -135,7 +123,7 @@ export default function ScanPage() {
         {/* Header */}
         <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-border/50 shadow-sm">
           <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-            <Link href="/" className="text-2xl font-sans font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary hover:opacity-80 transition-opacity">
+            <Link href="/" className="text-2xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary hover:opacity-80 transition-opacity">
               Pop Culture CLE
             </Link>
             <div className="flex items-center gap-3">
@@ -154,7 +142,7 @@ export default function ScanPage() {
         <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
           {/* Title */}
           <section className="text-center">
-            <h1 className="text-4xl md:text-5xl font-sans font-bold mb-2">
+            <h1 className="text-4xl md:text-5xl font-display font-bold mb-2">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Stamp Scanner</span>
             </h1>
             <p className="text-lg text-foreground/70">Scan customer QR codes to add stamps</p>
@@ -200,7 +188,7 @@ export default function ScanPage() {
 
           {/* Instructions */}
           <div className="card-vibrant bg-gradient-to-br from-secondary/10 to-teal-100/20 p-6 border border-border/50">
-            <h3 className="font-sans font-bold text-lg mb-3 text-foreground">How to Use:</h3>
+            <h3 className="font-display font-bold text-lg mb-3 text-foreground">How to Use:</h3>
             <ol className="space-y-2 text-sm text-foreground/80">
               <li>1. Ask customer to show their loyalty QR code</li>
               <li>2. Point camera at the QR code</li>

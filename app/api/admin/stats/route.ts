@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
 
     const { data: records, error: recordsError } = await supabase
       .from('loyalty_records')
-      .select('id');
+      .select('action');
 
     const { data: offers, error: offersError } = await supabase
       .from('offers')
@@ -27,8 +27,8 @@ export async function GET(req: NextRequest) {
     }
 
     const totalStamps = (users || []).reduce((sum, u) => sum + (u.stamp_count || 0), 0);
-    const rewardsRedeemed = (records || []).length;
-    const totalCustomers = (users || []).length;
+    const rewardsRedeemed = (records || []).filter(r => r.action === 'reward_claimed').length;
+    const totalCustomers = (users || []).filter(u => u.stamp_count !== null).length;
     const activeOffers = (offers || []).length;
 
     return NextResponse.json({

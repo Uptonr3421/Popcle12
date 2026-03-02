@@ -27,11 +27,11 @@ export default function Home() {
           <div className="max-w-5xl mx-auto text-center">
             {/* Brand Badge */}
             <div className="inline-block mb-6 px-4 py-2 bg-accent/20 rounded-full border border-accent/40 backdrop-blur-sm">
-              <span className="text-accent font-sans font-semibold text-sm">Handcrafted Gourmet Ice Cream</span>
+              <span className="text-accent font-display font-semibold text-sm">🍦 Handcrafted Gourmet Ice Cream 🍦</span>
             </div>
 
             {/* Main Heading */}
-            <h1 className="font-sans font-bold text-5xl md:text-7xl mb-4 leading-tight">
+            <h1 className="font-display font-bold text-5xl md:text-7xl mb-4 leading-tight">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent">
                 Pop Culture CLE
               </span>
@@ -88,7 +88,7 @@ export default function Home() {
                   <div className="text-5xl mb-3 animate-float" style={{ animationDelay: `${idx * 0.2}s` }}>
                     {feature.icon}
                   </div>
-                  <h3 className="font-sans font-bold text-lg mb-2 text-foreground">{feature.title}</h3>
+                  <h3 className="font-display font-bold text-lg mb-2 text-foreground">{feature.title}</h3>
                   <p className="text-sm text-foreground/70 leading-relaxed">{feature.desc}</p>
                 </div>
               ))}
@@ -99,7 +99,7 @@ export default function Home() {
         {/* Location Section */}
         <section className="py-12 md:py-20 px-4 bg-white/50 backdrop-blur-sm border-y border-border/50">
           <div className="max-w-4xl mx-auto">
-            <h2 className="font-sans text-3xl md:text-4xl font-bold text-center mb-12">Visit Us Today</h2>
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-center mb-12">Visit Us Today</h2>
             
             <div className="card-vibrant overflow-hidden bg-white shadow-xl hover:shadow-2xl transition-shadow">
               {/* Location Image */}
@@ -115,7 +115,7 @@ export default function Home() {
               {/* Location Info */}
               <div className="p-6 md:p-8">
                 <div className="mb-6">
-                  <p className="text-lg md:text-xl font-sans font-bold text-foreground mb-2">
+                  <p className="text-lg md:text-xl font-display font-bold text-foreground mb-2">
                     📍 33549 Solon Rd, Solon, OH 44139
                   </p>
                   <p className="text-foreground/70 leading-relaxed">
