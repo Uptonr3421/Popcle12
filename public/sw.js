@@ -1,9 +1,13 @@
-// Service Worker for push notifications
-const CACHE_NAME = 'pop-culture-v1';
+// Service Worker for Pop Culture CLE PWA
+const CACHE_NAME = 'pop-culture-cle-v2';
 const urlsToCache = [
   '/',
   '/manifest.json',
   '/offline.html',
+  '/icon-192x192.png',
+  '/icon-512x512.png',
+  '/apple-icon.png',
+  '/images/pop-culture-hero.jpg',
 ];
 
 // Install event

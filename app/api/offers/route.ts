@@ -24,9 +24,10 @@ export async function GET(req: NextRequest) {
       id: offer.id,
       title: offer.title,
       description: offer.description,
-      discount: offer.discount,
+      discount: offer.discount_percentage ? `${offer.discount_percentage}% OFF` : (offer.free_item ? 'FREE ITEM' : 'Special Offer'),
       expiresAt: offer.expires_at,
       active: offer.active,
+      geofenceEnabled: offer.geofence_enabled,
     }));
 
     return NextResponse.json({

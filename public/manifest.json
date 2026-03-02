@@ -1,96 +1,68 @@
 {
   "name": "Pop Culture CLE Loyalty",
-  "short_name": "Pop Culture",
-  "description": "Earn stamps, get free ice cream at Pop Culture CLE",
+  "short_name": "Pop Culture CLE",
+  "description": "Earn stamps, get rewards at Pop Culture CLE - Comics, Vinyl & Collectibles",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#ffffff",
-  "theme_color": "#8B3A62",
-  "categories": ["shopping", "entertainment"],
-  "screenshots": [
+  "background_color": "#0f0a1a",
+  "theme_color": "#f5d547",
+  "categories": ["shopping", "entertainment", "lifestyle"],
+  "lang": "en-US",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/apple-icon.png",
+      "type": "image/png",
+      "sizes": "180x180",
+      "purpose": "apple touch icon"
+    },
     {
       "src": "/icon-192x192.png",
       "type": "image/png",
       "sizes": "192x192",
-      "form_factor": "narrow"
+      "purpose": "any maskable"
     },
     {
       "src": "/icon-512x512.png",
       "type": "image/png",
       "sizes": "512x512",
-      "form_factor": "wide"
-    }
-  ],
-  "icons": [
-    {
-      "src": "/icon-96x96.png",
-      "type": "image/png",
-      "sizes": "96x96"
-    },
-    {
-      "src": "/icon-192x192.png",
-      "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "/icon-512x512.png",
-      "type": "image/png",
-      "sizes": "512x512"
+      "purpose": "any maskable"
     }
   ],
   "shortcuts": [
     {
-      "name": "View QR Code",
-      "short_name": "QR Code",
-      "description": "Show your loyalty QR code",
+      "name": "View My Stamps",
+      "short_name": "Stamps",
+      "description": "Check your loyalty stamp progress",
       "url": "/dashboard",
-      "icons": [
-        {
-          "src": "/icon-192x192.png",
-          "type": "image/png",
-          "sizes": "192x192"
-        }
-      ]
+      "icons": [{ "src": "/apple-icon.png", "sizes": "180x180" }]
     },
     {
-      "name": "View Offers",
+      "name": "Special Offers",
       "short_name": "Offers",
-      "description": "Check special offers near you",
+      "description": "View exclusive deals near you",
       "url": "/offers",
-      "icons": [
-        {
-          "src": "/icon-192x192.png",
-          "type": "image/png",
-          "sizes": "192x192"
-        }
-      ]
+      "icons": [{ "src": "/apple-icon.png", "sizes": "180x180" }]
     },
     {
-      "name": "Scan QR",
+      "name": "Employee Scanner",
       "short_name": "Scan",
-      "description": "Scan customer codes (Employee)",
+      "description": "Scan customer QR codes",
       "url": "/dashboard/scan",
-      "icons": [
-        {
-          "src": "/icon-192x192.png",
-          "type": "image/png",
-          "sizes": "192x192"
-        }
-      ]
+      "icons": [{ "src": "/apple-icon.png", "sizes": "180x180" }]
     }
   ],
   "prefer_related_applications": false,
-  "screenshots": [],
-  "share_target": {
-    "action": "/share",
-    "method": "POST",
-    "enctype": "multipart/form-data",
-    "params": {
-      "title": "title",
-      "text": "text",
-      "url": "url"
+  "related_applications": [],
+  "screenshots": [
+    {
+      "src": "/images/pop-culture-hero.jpg",
+      "type": "image/jpeg",
+      "sizes": "320x200",
+      "form_factor": "narrow",
+      "label": "Pop Culture CLE Loyalty App"
     }
-  }
+  ]
 }

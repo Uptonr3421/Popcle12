@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import QRCode from 'qrcode.react';
+import { QRCodeCanvas } from 'qrcode.react';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -85,7 +85,7 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-background via-orange-50 to-background flex items-center justify-center">
+      <main className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin text-4xl mb-4">⏳</div>
           <p className="text-foreground/70 font-medium">Loading your loyalty account...</p>
@@ -101,23 +101,24 @@ export default function DashboardPage() {
   const isReady = stampCount >= 10;
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background via-orange-50 to-background pb-8">
+    <main className="min-h-screen bg-background pb-8">
       {/* Animated background */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-40">
-        <div className="absolute top-20 right-1/4 w-96 h-96 bg-primary rounded-full mix-blend-multiply filter blur-3xl animate-float"></div>
-        <div className="absolute bottom-40 left-1/4 w-96 h-96 bg-secondary rounded-full mix-blend-multiply filter blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
+      <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-30">
+        <div className="absolute top-20 right-1/4 w-96 h-96 bg-primary/50 rounded-full filter blur-3xl animate-float"></div>
+        <div className="absolute bottom-40 left-1/4 w-96 h-96 bg-secondary/50 rounded-full filter blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-accent/30 rounded-full filter blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
       </div>
 
       <div className="relative z-10">
         {/* Header */}
-        <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-border/50 shadow-sm">
+        <header className="sticky top-0 z-20 bg-card/80 backdrop-blur-md border-b border-border shadow-sm">
           <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-            <Link href="/" className="text-2xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary hover:opacity-80 transition-opacity">
+            <Link href="/" className="text-2xl font-display font-bold text-primary hover:opacity-80 transition-opacity">
               Pop Culture CLE
             </Link>
             <button
               onClick={handleLogout}
-              className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors px-3 py-1 rounded hover:bg-primary/10"
+              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors px-3 py-1 rounded hover:bg-primary/10"
             >
               Logout
             </button>
@@ -137,7 +138,7 @@ export default function DashboardPage() {
 
           {/* Geofence Alert */}
           {nearStore && (
-            <section className="card-vibrant bg-gradient-to-r from-secondary/20 via-teal-100/30 to-transparent p-6 border-2 border-secondary/50 animate-glow">
+            <section className="card-vibrant bg-gradient-to-r from-secondary/20 via-accent/20 to-transparent p-6 border-2 border-secondary/50 geofence-active">
               <p className="font-semibold text-secondary text-lg text-center flex items-center justify-center gap-2">
                 <span className="text-2xl animate-bounce">📍</span>
                 You're near Pop Culture CLE! Check offers and special deals!
@@ -146,7 +147,7 @@ export default function DashboardPage() {
           )}
 
           {/* Stamp Counter - Main Visual */}
-          <section className="card-vibrant bg-white p-8 md:p-12 text-center shadow-2xl">
+          <section className="card-vibrant bg-card p-8 md:p-12 text-center shadow-2xl border border-border">
             <div className="mb-8">
               <p className="text-sm font-medium text-foreground/70 mb-4 uppercase tracking-widest">Current Progress</p>
               
@@ -179,8 +180,9 @@ export default function DashboardPage() {
                     />
                     <defs>
                       <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style={{ stopColor: 'rgb(76, 175, 158)', stopOpacity: 1 }} />
-                        <stop offset="100%" style={{ stopColor: 'rgb(139, 58, 98)', stopOpacity: 1 }} />
+                        <stop offset="0%" style={{ stopColor: '#f5d547', stopOpacity: 1 }} />
+                        <stop offset="50%" style={{ stopColor: '#e84a8a', stopOpacity: 1 }} />
+                        <stop offset="100%" style={{ stopColor: '#5dd9d9', stopOpacity: 1 }} />
                       </linearGradient>
                     </defs>
                   </svg>
@@ -196,8 +198,8 @@ export default function DashboardPage() {
               {/* Status Message */}
               <div className="mb-8">
                 {isReady ? (
-                  <div className="inline-block px-6 py-3 bg-gradient-to-r from-secondary to-teal-500 text-white rounded-full font-bold text-lg animate-bounce-in shadow-lg">
-                    🎉 Ready for Free Item!
+                  <div className="inline-block px-6 py-3 bg-gradient-to-r from-secondary to-accent text-white rounded-full font-bold text-lg animate-bounce-in shadow-lg">
+                    Ready for Free Item!
                   </div>
                 ) : (
                   <p className="text-2xl font-semibold text-foreground">
@@ -213,7 +215,7 @@ export default function DashboardPage() {
                     key={idx}
                     className={`w-10 h-10 md:w-12 md:h-12 rounded-lg font-display font-bold text-lg flex items-center justify-center transition-all transform ${
                       idx < stampCount
-                        ? 'bg-gradient-to-br from-secondary to-teal-500 text-white scale-110 shadow-lg'
+                        ? 'bg-gradient-to-br from-secondary to-accent text-white scale-110 shadow-lg'
                         : 'bg-border text-foreground/40'
                     }`}
                     style={{
@@ -244,20 +246,20 @@ export default function DashboardPage() {
 
           {/* QR Code Section */}
           {showQR && (
-            <section className="card-vibrant bg-white p-8 md:p-12 text-center shadow-2xl animate-bounce-in">
+            <section className="card-vibrant bg-card p-8 md:p-12 text-center shadow-2xl animate-bounce-in border border-border">
               <h2 className="text-2xl font-display font-bold mb-2">Your Loyalty QR Code</h2>
-              <p className="text-foreground/70 mb-8">Show this to staff to add stamps to your account</p>
+              <p className="text-muted-foreground mb-8">Show this to staff to add stamps to your account</p>
 
               {/* Ornate QR Frame */}
               <div className="flex justify-center mb-8">
-                <div className="bg-gradient-to-br from-accent/20 to-secondary/20 p-8 rounded-2xl border-4 border-primary/30 shadow-lg">
+                <div className="bg-gradient-to-br from-primary/20 to-secondary/20 p-8 rounded-2xl border-4 border-primary/30 shadow-lg">
                   <div className="bg-white p-6 rounded-lg shadow-md">
-                    <QRCode
+                    <QRCodeCanvas
                       value={user.phone}
                       size={256}
                       level="H"
                       includeMargin={true}
-                      fgColor="#8B3A62"
+                      fgColor="#0f0a1a"
                       bgColor="#FFFFFF"
                     />
                   </div>
@@ -265,30 +267,30 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              <p className="text-xs text-foreground/60 max-w-md mx-auto">
-                Each visit to Pop Culture CLE gets you a scan. Ten scans equals one free gourmet ice cream popsicle!
+              <p className="text-xs text-muted-foreground max-w-md mx-auto">
+                Each visit to Pop Culture CLE gets you a scan. Ten scans equals one free reward!
               </p>
             </section>
           )}
 
           {/* Store Info Section */}
-          <section className="card-vibrant bg-gradient-to-br from-accent/10 to-secondary/10 p-8 text-center border border-border/50">
+          <section className="card-vibrant bg-gradient-to-br from-secondary/10 to-accent/10 p-8 text-center border border-border">
             <h3 className="text-xl font-display font-bold mb-4">Visit Our Store</h3>
-            <p className="text-foreground/70 mb-6 text-lg font-semibold">
-              📍 33549 Solon Rd, Solon, OH 44139
+            <p className="text-foreground/80 mb-6 text-lg font-semibold">
+              33549 Solon Rd, Solon, OH 44139
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <a
                 href="tel:+12162457316"
-                className="px-6 py-3 bg-gradient-to-r from-accent to-orange-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-accent/50 transition-all hover:scale-105"
+                className="px-6 py-3 bg-gradient-to-r from-primary to-secondary text-primary-foreground rounded-lg font-semibold hover:shadow-lg hover:shadow-primary/50 transition-all hover:scale-105"
               >
-                📞 Call: (216) 245-7316
+                Call: (216) 245-7316
               </a>
               <a
                 href="mailto:info@popculturecle.com"
-                className="px-6 py-3 bg-gradient-to-r from-secondary to-teal-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-secondary/50 transition-all hover:scale-105"
+                className="px-6 py-3 bg-gradient-to-r from-secondary to-accent text-secondary-foreground rounded-lg font-semibold hover:shadow-lg hover:shadow-secondary/50 transition-all hover:scale-105"
               >
-                📧 Email Us
+                Email Us
               </a>
             </div>
           </section>

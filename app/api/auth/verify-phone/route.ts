@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     // Check if user exists
     const { data: user, error: queryError } = await supabase
       .from('users')
-      .select('phone')
+      .select('phone, name, user_type')
       .eq('phone', phone)
       .single();
 
@@ -32,7 +32,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ 
       exists,
-      phone 
+      phone,
+      name: user?.name || null,
+      userType: user?.user_type || 'customer',
     });
   } catch (error) {
     console.error('Auth verify error:', error);

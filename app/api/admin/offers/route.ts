@@ -17,13 +17,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Parse discount - extract percentage if it's like "50% Off"
+    const discountMatch = discount.match(/(\d+)/);
+    const discountPercentage = discountMatch ? parseInt(discountMatch[1]) : null;
+    const isFreeItem = discount.toLowerCase().includes('free');
+
     const { data: offer, error } = await supabase
       .from('offers')
       .insert([
         {
           title,
           description,
-          discount,
+          discount_percentage: discountPercentage,
+          free_item: isFreeItem,
           expires_at: expiresAt,
           active: true,
           created_at: new Date().toISOString(),
@@ -42,7 +48,7 @@ export async function POST(req: NextRequest) {
         id: offer.id,
         title: offer.title,
         description: offer.description,
-        discount: offer.discount,
+        discount: offer.discount_percentage ? `${offer.discount_percentage}% OFF` : (offer.free_item ? 'FREE ITEM' : 'Special Offer'),
         expiresAt: offer.expires_at,
         active: offer.active,
       },

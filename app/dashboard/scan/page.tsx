@@ -100,10 +100,10 @@ export default function ScanPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-background via-orange-50 to-background flex items-center justify-center">
+      <main className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin text-4xl mb-4">⏳</div>
-          <p className="text-foreground/70 font-medium">Loading scanner...</p>
+          <p className="text-muted-foreground font-medium">Loading scanner...</p>
         </div>
       </main>
     );
@@ -112,25 +112,25 @@ export default function ScanPage() {
   if (!user) return null;
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background via-orange-50 to-background pb-8">
+    <main className="min-h-screen bg-background pb-8">
       {/* Animated background */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-40">
-        <div className="absolute top-20 right-1/4 w-96 h-96 bg-primary rounded-full mix-blend-multiply filter blur-3xl animate-float"></div>
-        <div className="absolute bottom-40 left-1/4 w-96 h-96 bg-secondary rounded-full mix-blend-multiply filter blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
+      <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-30">
+        <div className="absolute top-20 right-1/4 w-96 h-96 bg-primary/50 rounded-full filter blur-3xl animate-float"></div>
+        <div className="absolute bottom-40 left-1/4 w-96 h-96 bg-secondary/50 rounded-full filter blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
       </div>
 
       <div className="relative z-10">
         {/* Header */}
-        <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-border/50 shadow-sm">
+        <header className="sticky top-0 z-20 bg-card/80 backdrop-blur-md border-b border-border shadow-sm">
           <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-            <Link href="/" className="text-2xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary hover:opacity-80 transition-opacity">
+            <Link href="/" className="text-2xl font-display font-bold text-primary hover:opacity-80 transition-opacity">
               Pop Culture CLE
             </Link>
             <div className="flex items-center gap-3">
-              <span className="text-sm font-medium text-foreground/70">👤 {user.name || 'Employee'}</span>
+              <span className="text-sm font-medium text-muted-foreground">{user.name || 'Employee'}</span>
               <button
                 onClick={handleLogout}
-                className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors px-3 py-1 rounded hover:bg-primary/10"
+                className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors px-3 py-1 rounded hover:bg-primary/10"
               >
                 Logout
               </button>
@@ -142,18 +142,18 @@ export default function ScanPage() {
         <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
           {/* Title */}
           <section className="text-center">
-            <h1 className="text-4xl md:text-5xl font-display font-bold mb-2">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Stamp Scanner</span>
+            <h1 className="text-4xl md:text-5xl font-display font-bold mb-2 text-primary">
+              Stamp Scanner
             </h1>
-            <p className="text-lg text-foreground/70">Scan customer QR codes to add stamps</p>
+            <p className="text-lg text-muted-foreground">Scan customer QR codes to add stamps</p>
           </section>
 
           {/* Message Display */}
           {message && (
             <div className={`card-vibrant p-4 text-center animate-bounce-in border-2 ${
               message.type === 'success' 
-                ? 'bg-green-50 border-green-300 text-green-700' 
-                : 'bg-red-50 border-red-300 text-red-700'
+                ? 'bg-accent/20 border-accent text-accent' 
+                : 'bg-destructive/20 border-destructive text-destructive'
             }`}>
               <p className="font-bold text-lg">
                 {message.type === 'success' ? '✓' : '✕'} {message.text}
@@ -162,7 +162,7 @@ export default function ScanPage() {
           )}
 
           {/* Scanner Container */}
-          <div className="card-vibrant bg-white p-6 md:p-8 shadow-2xl">
+          <div className="card-vibrant bg-card p-6 md:p-8 shadow-2xl border border-border">
             <div className="mb-4">
               <p className="text-sm text-foreground/70 text-center font-medium mb-4">
                 Position QR code in the frame below
@@ -187,7 +187,7 @@ export default function ScanPage() {
           </div>
 
           {/* Instructions */}
-          <div className="card-vibrant bg-gradient-to-br from-secondary/10 to-teal-100/20 p-6 border border-border/50">
+          <div className="card-vibrant bg-gradient-to-br from-secondary/10 to-accent/10 p-6 border border-border">
             <h3 className="font-display font-bold text-lg mb-3 text-foreground">How to Use:</h3>
             <ol className="space-y-2 text-sm text-foreground/80">
               <li>1. Ask customer to show their loyalty QR code</li>
@@ -199,8 +199,8 @@ export default function ScanPage() {
           </div>
 
           {/* Info */}
-          <div className="text-center text-xs text-foreground/60">
-            <p className="font-medium mb-1">Pop Culture CLE Employee Mode</p>
+          <div className="text-center text-xs text-muted-foreground">
+            <p className="font-medium mb-1 text-accent">Pop Culture CLE Employee Mode</p>
             <p>Scanner will automatically add stamps to customer accounts</p>
           </div>
         </div>

@@ -9,8 +9,8 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] });
 const _poppins = Poppins({ weight: ['400', '500', '600', '700'], subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Pop Culture CLE Loyalty - Earn Stamps, Get Free Ice Cream',
-  description: 'Earn stamps on every visit and get free handcrafted gourmet ice cream popsicles at Pop Culture CLE in Solon, OH',
+  title: 'Pop Culture CLE - Comics, Vinyl & Collectibles Loyalty App',
+  description: 'Earn stamps on every visit and get free rewards at Pop Culture CLE - Your destination for comics, vinyl, trading cards, and pop culture collectibles in Solon, OH',
   generator: 'v0.app',
   manifest: '/manifest.json',
   icons: {
@@ -42,8 +42,8 @@ export const viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: '#8B3A62',
-  colorScheme: 'light dark',
+  themeColor: '#0f0a1a',
+  colorScheme: 'dark',
 }
 
 export default function RootLayout({

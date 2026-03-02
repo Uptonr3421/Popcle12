@@ -1,169 +1,435 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
 
-export default function Home() {
-  const [mounted, setMounted] = useState(false);
+export default function DemoLandingPage() {
+  const [showIntro, setShowIntro] = useState(true);
+  const [introPhase, setIntroPhase] = useState(0);
+  const [activeFeature, setActiveFeature] = useState(0);
 
   useEffect(() => {
-    setMounted(true);
+    const timers = [
+      setTimeout(() => setIntroPhase(1), 400),
+      setTimeout(() => setIntroPhase(2), 1400),
+      setTimeout(() => setIntroPhase(3), 2400),
+    ];
+    return () => timers.forEach(clearTimeout);
   }, []);
 
-  if (!mounted) return null;
+  useEffect(() => {
+    if (showIntro) return;
+    const interval = setInterval(() => {
+      setActiveFeature((prev) => (prev + 1) % 4);
+    }, 3500);
+    return () => clearInterval(interval);
+  }, [showIntro]);
+
+  const features = [
+    {
+      title: 'Digital Loyalty Cards',
+      description: 'Replace paper punch cards forever. Customers earn stamps automatically with every purchase - no more lost cards.',
+      icon: (
+        <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+        </svg>
+      ),
+    },
+    {
+      title: 'Instant QR Scanning',
+      description: 'Staff scans customer codes in 2 seconds flat. Works on any smartphone - no special hardware needed.',
+      icon: (
+        <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+        </svg>
+      ),
+    },
+    {
+      title: 'Customer Insights',
+      description: 'See who your best customers are, track visit patterns, and make smarter business decisions with real data.',
+      icon: (
+        <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+      ),
+    },
+    {
+      title: 'Smart Notifications',
+      description: 'Send special offers when customers are nearby. Bring them back with perfectly timed reminders.',
+      icon: (
+        <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+        </svg>
+      ),
+    },
+  ];
+
+  // Personal intro screen for Nicole
+  if (showIntro) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/10 rounded-full blur-3xl transition-all duration-[2000ms] ${introPhase >= 1 ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`} />
+        </div>
+
+        <div className="relative z-10 max-w-md mx-auto text-center">
+          <div className={`transition-all duration-1000 ${introPhase >= 1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+            <p className="text-foreground/90 text-xl md:text-2xl leading-relaxed font-light">
+              {'"'}This one{"'"}s for you, Nicole.
+            </p>
+            <p className="text-muted-foreground text-lg md:text-xl leading-relaxed mt-6">
+              You{"'"}ve already built something Cleveland loves — now let{"'"}s make it even easier for them to come back.
+            </p>
+            <p className="text-primary text-2xl md:text-3xl font-bold mt-8">
+              Welcome to Pop Culture CLE.
+            </p>
+          </div>
+
+          <div className={`mt-14 transition-all duration-1000 ${introPhase >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+            <p className="text-foreground font-medium text-lg">
+              — Upton Rand
+            </p>
+            <p className="text-primary/80 font-medium mt-1">
+              Alignment AI
+            </p>
+            <a 
+              href="mailto:Contact@alignment-ai.io" 
+              className="text-muted-foreground text-sm hover:text-primary transition-colors mt-2 inline-block"
+            >
+              Contact@alignment-ai.io
+            </a>
+          </div>
+
+          <div className={`mt-12 transition-all duration-1000 ${introPhase >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+            <Button
+              size="lg"
+              onClick={() => setShowIntro(false)}
+              className="px-10 py-6 text-lg font-semibold rounded-full"
+            >
+              View Your App
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-orange-50 to-background">
-      {/* Animated background decorations */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 right-10 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-float"></div>
-        <div className="absolute bottom-40 left-10 w-96 h-96 bg-secondary/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '0.5s' }}></div>
-        <div className="absolute top-1/2 right-1/4 w-80 h-80 bg-primary/15 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
-      </div>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="sticky top-0 z-50 bg-background/90 backdrop-blur-md border-b border-border">
+        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <img 
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/4902868e-33d5-4d7b-9adf-25927ab0ba5e.jpeg"
+              alt="Pop Culture CLE"
+              className="w-9 h-9 rounded-full object-cover border-2 border-primary/30"
+            />
+            <span className="font-bold text-lg text-foreground hidden sm:block">Pop Culture CLE</span>
+          </div>
+          <nav className="flex items-center gap-2 sm:gap-6">
+            <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Features</a>
+            <a href="#demo" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Demo</a>
+            <Link href="/auth">
+              <Button size="sm" className="rounded-full px-4">
+                Try App
+              </Button>
+            </Link>
+          </nav>
+        </div>
+      </header>
 
-      <div className="relative z-10">
-        {/* Hero Section */}
-        <section className="pt-8 pb-12 md:pt-16 md:pb-20 px-4">
-          <div className="max-w-5xl mx-auto text-center">
-            {/* Brand Badge */}
-            <div className="inline-block mb-6 px-4 py-2 bg-accent/20 rounded-full border border-accent/40 backdrop-blur-sm">
-              <span className="text-accent font-display font-semibold text-sm">🍦 Handcrafted Gourmet Ice Cream 🍦</span>
+      {/* Hero Section */}
+      <section className="py-16 md:py-24 px-4">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex flex-col lg:flex-row items-center gap-12">
+            <div className="flex-1 text-center lg:text-left">
+              <div className="inline-block px-4 py-1.5 bg-primary/10 rounded-full mb-6">
+                <span className="text-primary text-sm font-medium">Built for Pop Culture CLE</span>
+              </div>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight text-balance">
+                Turn every visit into lasting loyalty
+              </h1>
+              <p className="mt-6 text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0">
+                A digital rewards program that keeps customers coming back. No paper cards. No lost stamps. Just simple, powerful loyalty.
+              </p>
+              <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
+                <Link href="/auth">
+                  <Button size="lg" className="w-full sm:w-auto px-8 py-6 text-base font-semibold rounded-full">
+                    Try the Demo
+                  </Button>
+                </Link>
+                <a href="#features">
+                  <Button variant="outline" size="lg" className="w-full sm:w-auto px-8 py-6 text-base rounded-full">
+                    See Features
+                  </Button>
+                </a>
+              </div>
             </div>
-
-            {/* Main Heading */}
-            <h1 className="font-display font-bold text-5xl md:text-7xl mb-4 leading-tight">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent">
-                Pop Culture CLE
-              </span>
-            </h1>
             
-            {/* Tagline */}
-            <p className="text-xl md:text-2xl text-foreground/80 mb-3 font-medium">
-              No air. Maximum flavor. Pure richness.
-            </p>
-            <p className="text-lg md:text-xl text-foreground/70 max-w-2xl mx-auto leading-relaxed mb-10">
-              Earn stamps on every visit and unlock <span className="font-bold text-primary">free gourmet ice cream popsicles</span> packed with pure, creamy flavor.
-            </p>
-
-            {/* Product Image Grid */}
-            <div className="mb-12 grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 max-w-3xl mx-auto">
-              {[
-                { src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/c4d27db8-4d52-48b1-a5d2-ccc0160d0509.jpeg', alt: 'Colorful popsicle with sprinkles' },
-                { src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/a8db6a6b-90e0-4e76-aae4-d559eb291f50.jpeg', alt: 'Ice cream cones display' },
-                { src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/4902868e-33d5-4d7b-9adf-25927ab0ba5e.jpeg', alt: 'Pop Culture CLE storefront sign' },
-              ].map((product, idx) => (
-                <div key={idx} className="relative group rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-110 h-32 md:h-48 cursor-pointer">
+            {/* Store Images Grid */}
+            <div className="flex-1 w-full max-w-md">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="aspect-square rounded-2xl overflow-hidden border border-border">
                   <img 
-                    src={product.src} 
-                    alt={product.alt}
+                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/4902868e-33d5-4d7b-9adf-25927ab0ba5e.jpeg"
+                    alt="Pop Culture CLE"
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
-              ))}
-            </div>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center mb-16 px-2">
-              <Link href="/auth" className="w-full sm:w-auto">
-                <button className="btn-primary-glow w-full sm:w-auto shadow-lg hover:shadow-2xl transform transition-all">
-                  🎫 Join Loyalty Program
-                </button>
-              </Link>
-              <Link href="/auth?mode=employee" className="w-full sm:w-auto">
-                <button className="btn-vibrant w-full sm:w-auto border-2 border-secondary text-secondary hover:bg-secondary/10 shadow-lg hover:shadow-2xl transform transition-all">
-                  👀 Employee Scanner
-                </button>
-              </Link>
-            </div>
-
-            {/* Features Grid */}
-            <div className="grid md:grid-cols-3 gap-4 md:gap-6 max-w-3xl mx-auto">
-              {[
-                { icon: '📍', title: 'Geofence Offers', desc: 'Get special deals when near our Solon location', color: 'from-accent/20 to-orange-100' },
-                { icon: '🎫', title: '10 Stamps = Free', desc: 'Each visit earns a stamp towards free ice cream', color: 'from-secondary/20 to-teal-100' },
-                { icon: '🔔', title: 'Push Alerts', desc: 'Be first to know about exclusive promotions', color: 'from-primary/20 to-rose-100' },
-              ].map((feature, idx) => (
-                <div key={idx} className={`card-vibrant bg-gradient-to-br ${feature.color} p-6 text-center hover:scale-105 transition-transform`}>
-                  <div className="text-5xl mb-3 animate-float" style={{ animationDelay: `${idx * 0.2}s` }}>
-                    {feature.icon}
-                  </div>
-                  <h3 className="font-display font-bold text-lg mb-2 text-foreground">{feature.title}</h3>
-                  <p className="text-sm text-foreground/70 leading-relaxed">{feature.desc}</p>
+                <div className="aspect-square rounded-2xl overflow-hidden border border-border">
+                  <img 
+                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/81ccd041-ddbb-4a54-95b2-e2609a59427d.jpeg"
+                    alt="Store Interior"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Location Section */}
-        <section className="py-12 md:py-20 px-4 bg-white/50 backdrop-blur-sm border-y border-border/50">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-center mb-12">Visit Us Today</h2>
-            
-            <div className="card-vibrant overflow-hidden bg-white shadow-xl hover:shadow-2xl transition-shadow">
-              {/* Location Image */}
-              <div className="relative h-48 md:h-64 overflow-hidden">
-                <img 
-                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/81ccd041-ddbb-4a54-95b2-e2609a59427d.jpeg"
-                  alt="Pop Culture CLE storefront"
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-              </div>
-
-              {/* Location Info */}
-              <div className="p-6 md:p-8">
-                <div className="mb-6">
-                  <p className="text-lg md:text-xl font-display font-bold text-foreground mb-2">
-                    📍 33549 Solon Rd, Solon, OH 44139
-                  </p>
-                  <p className="text-foreground/70 leading-relaxed">
-                    Stop by our cozy shop and grab your favorite handcrafted ice cream popsicle. Open daily for your sweet cravings!
-                  </p>
+                <div className="aspect-square rounded-2xl overflow-hidden border border-border">
+                  <img 
+                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/c4d27db8-4d52-48b1-a5d2-ccc0160d0509.jpeg"
+                    alt="Collectibles"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
-
-                {/* Contact Actions */}
-                <div className="flex flex-wrap justify-center gap-3 md:gap-4">
-                  <a 
-                    href="tel:+12162457316" 
-                    className="px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-accent to-orange-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-accent/50 transition-all hover:scale-105"
-                  >
-                    📞 Call: (216) 245-7316
-                  </a>
-                  <a 
-                    href="mailto:info@popculturecle.com" 
-                    className="px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-secondary to-teal-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-secondary/50 transition-all hover:scale-105"
-                  >
-                    📧 Email Us
-                  </a>
-                </div>
-
-                {/* Additional Info */}
-                <div className="mt-6 pt-6 border-t border-border/30">
-                  <p className="text-sm text-foreground/60 mb-3">Follow us for updates and special announcements:</p>
-                  <div className="flex justify-center gap-4 md:gap-6">
-                    <a href="https://instagram.com/popculturecle" target="_blank" rel="noopener noreferrer" className="text-2xl hover:scale-125 transition-transform">📸</a>
-                    <a href="https://facebook.com/profile.php?id=248019982622260" target="_blank" rel="noopener noreferrer" className="text-2xl hover:scale-125 transition-transform">👍</a>
-                    <a href="https://x.com/popculturecle" target="_blank" rel="noopener noreferrer" className="text-2xl hover:scale-125 transition-transform">𝕏</a>
-                    <a href="https://m.yelp.com/biz/pop-culture-cle-solon-2" target="_blank" rel="noopener noreferrer" className="text-2xl hover:scale-125 transition-transform">⭐</a>
-                  </div>
+                <div className="aspect-square rounded-2xl overflow-hidden border border-border">
+                  <img 
+                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/a8db6a6b-90e0-4e76-aae4-d559eb291f50.jpeg"
+                    alt="Products"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
               </div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Footer */}
-        <footer className="py-8 px-4 text-center border-t border-border/50">
-          <p className="text-sm text-foreground/60 mb-2">
-            Pop Culture CLE © 2026 | Premium Handcrafted Desserts
+      {/* Stats */}
+      <section className="py-10 bg-card border-y border-border">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[
+              { value: '10x', label: 'More repeat visits' },
+              { value: '85%', label: 'Customer retention' },
+              { value: '2 sec', label: 'Scan time' },
+              { value: '$0', label: 'Hardware cost' },
+            ].map((stat) => (
+              <div key={stat.label} className="text-center">
+                <p className="text-2xl md:text-3xl font-bold text-primary">{stat.value}</p>
+                <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section id="features" className="py-16 md:py-24 px-4">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+              Everything you need
+            </h2>
+            <p className="mt-3 text-lg text-muted-foreground">
+              A complete loyalty solution built specifically for your store
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-4">
+            {features.map((feature, idx) => (
+              <div 
+                key={feature.title}
+                className={`p-6 rounded-2xl border transition-all duration-300 ${
+                  activeFeature === idx 
+                    ? 'bg-primary/5 border-primary/30' 
+                    : 'bg-card border-border hover:border-primary/20'
+                }`}
+                onClick={() => setActiveFeature(idx)}
+              >
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${
+                  activeFeature === idx ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+                }`}>
+                  {feature.icon}
+                </div>
+                <h3 className="text-lg font-bold text-foreground mb-2">{feature.title}</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Demo Section */}
+      <section id="demo" className="py-16 md:py-24 px-4 bg-card">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+              Try it yourself
+            </h2>
+            <p className="mt-3 text-lg text-muted-foreground">
+              Experience the app exactly as your customers and staff will
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-3 gap-4">
+            <Link 
+              href="/auth"
+              className="group p-6 bg-background rounded-2xl border border-border hover:border-primary/50 transition-all"
+            >
+              <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                <svg className="w-7 h-7 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <h3 className="font-bold text-foreground mb-1">Customer View</h3>
+              <p className="text-sm text-muted-foreground mb-3">See loyalty card, stamps & QR code</p>
+              <span className="text-primary text-sm font-medium group-hover:underline">Try as customer</span>
+            </Link>
+
+            <Link 
+              href="/auth?mode=employee"
+              className="group p-6 bg-background rounded-2xl border border-border hover:border-primary/50 transition-all"
+            >
+              <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                <svg className="w-7 h-7 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                </svg>
+              </div>
+              <h3 className="font-bold text-foreground mb-1">Employee Scanner</h3>
+              <p className="text-sm text-muted-foreground mb-3">Scan codes & add stamps</p>
+              <span className="text-primary text-sm font-medium group-hover:underline">Try as employee</span>
+            </Link>
+
+            <Link 
+              href="/admin"
+              className="group p-6 bg-background rounded-2xl border border-border hover:border-primary/50 transition-all"
+            >
+              <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                <svg className="w-7 h-7 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <h3 className="font-bold text-foreground mb-1">Owner Dashboard</h3>
+              <p className="text-sm text-muted-foreground mb-3">Manage customers & offers</p>
+              <span className="text-primary text-sm font-medium group-hover:underline">Try as owner</span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="py-16 md:py-24 px-4">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+              Simple for everyone
+            </h2>
+          </div>
+
+          <div className="grid sm:grid-cols-3 gap-8">
+            {[
+              { step: '1', title: 'Customer signs up', desc: 'Quick phone registration. No app download required.' },
+              { step: '2', title: 'Show QR at checkout', desc: 'Staff scans the code. Stamp added instantly.' },
+              { step: '3', title: 'Earn free rewards', desc: '10 stamps = 1 free item. They keep coming back.' },
+            ].map((item) => (
+              <div key={item.step} className="text-center">
+                <div className="w-14 h-14 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
+                  {item.step}
+                </div>
+                <h3 className="font-bold text-foreground mb-2">{item.title}</h3>
+                <p className="text-sm text-muted-foreground">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* App Features List */}
+      <section className="py-16 md:py-24 px-4 bg-card">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+              What{"'"}s included
+            </h2>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-x-12 gap-y-4 max-w-3xl mx-auto">
+            {[
+              'Digital loyalty cards for all customers',
+              'QR code scanning from any smartphone',
+              'Real-time stamp tracking',
+              'Customer visit analytics',
+              'Automatic reward redemption',
+              'Push notifications (coming soon)',
+              'Location-based offers',
+              'Admin dashboard',
+              'Employee scanner mode',
+              'Customer database',
+              'Export customer data',
+              'iPhone app ready',
+            ].map((item) => (
+              <div key={item} className="flex items-center gap-3 py-2">
+                <svg className="w-5 h-5 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <span className="text-foreground">{item}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-16 md:py-24 px-4">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+            Ready to reward your customers?
+          </h2>
+          <p className="mt-4 text-lg text-muted-foreground">
+            This app is built and ready for Pop Culture CLE. Let{"'"}s launch it together.
           </p>
-          <p className="text-xs text-foreground/50">
-            Loyalty App v1.0 | Mobile-First Design | Web & iPhone Ready
-          </p>
-        </footer>
-      </div>
+          <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+            <Link href="/auth">
+              <Button size="lg" className="w-full sm:w-auto px-8 py-6 text-base font-semibold rounded-full">
+                Try the Full Demo
+              </Button>
+            </Link>
+            <a href="mailto:Contact@alignment-ai.io">
+              <Button variant="outline" size="lg" className="w-full sm:w-auto px-8 py-6 text-base rounded-full">
+                Contact Alignment AI
+              </Button>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-8 border-t border-border">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <img 
+                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/4902868e-33d5-4d7b-9adf-25927ab0ba5e.jpeg"
+                alt="Pop Culture CLE"
+                className="w-8 h-8 rounded-full object-cover"
+              />
+              <span className="font-semibold text-foreground">Pop Culture CLE</span>
+            </div>
+            <div className="text-center sm:text-right">
+              <p className="text-sm text-muted-foreground">
+                Built by{' '}
+                <a href="https://alignment-ai.io" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                  Alignment AI
+                </a>
+              </p>
+              <p className="text-xs text-muted-foreground/60 mt-1">
+                33549 Solon Rd, Solon, OH 44139
+              </p>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

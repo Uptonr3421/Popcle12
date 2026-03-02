@@ -45,13 +45,14 @@ export default function AuthPage() {
         throw new Error('Failed to verify phone');
       }
 
-      const { exists } = await response.json();
+      const { exists, name: userName, userType } = await response.json();
       
       if (exists) {
         // Phone exists, go to dashboard
         localStorage.setItem('userPhone', digits);
-        localStorage.setItem('userMode', isEmployee ? 'employee' : 'customer');
-        router.push(isEmployee ? '/dashboard/scan' : '/dashboard');
+        if (userName) localStorage.setItem('userName', userName);
+        localStorage.setItem('userMode', userType || (isEmployee ? 'employee' : 'customer'));
+        router.push((userType === 'employee' || isEmployee) ? '/dashboard/scan' : '/dashboard');
       } else {
         // New user, need name
         setStep('name');
@@ -101,32 +102,32 @@ export default function AuthPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background via-orange-50 to-background flex items-center justify-center p-4 relative overflow-hidden">
+    <main className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
       {/* Animated background */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-50">
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-primary rounded-full mix-blend-multiply filter blur-3xl animate-float"></div>
-        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-secondary rounded-full mix-blend-multiply filter blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-1/2 right-0 w-80 h-80 bg-accent rounded-full mix-blend-multiply filter blur-3xl animate-float" style={{ animationDelay: '0.5s' }}></div>
+      <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-30">
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-primary/50 rounded-full filter blur-3xl animate-float"></div>
+        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-secondary/50 rounded-full filter blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/2 right-0 w-80 h-80 bg-accent/50 rounded-full filter blur-3xl animate-float" style={{ animationDelay: '0.5s' }}></div>
       </div>
 
       <div className="relative z-10 w-full max-w-md">
         {/* Logo/Header */}
         <div className="text-center mb-10">
           <Link href="/" className="inline-block mb-4 hover:opacity-80 transition-opacity">
-            <h1 className="text-4xl md:text-5xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent">
+            <h1 className="text-4xl md:text-5xl font-display font-bold text-primary animate-neon-pulse">
               Pop Culture CLE
             </h1>
           </Link>
-          <p className="text-foreground/70 font-medium">
-            {isEmployee ? '👀 Employee Scanner' : '🎫 Loyalty Program'}
+          <p className="text-foreground/80 font-medium">
+            {isEmployee ? 'Employee Scanner' : 'Loyalty Program'}
           </p>
-          <p className="text-sm text-foreground/60 mt-1">
-            {isEmployee ? 'Scan customer QR codes to add stamps' : 'Earn stamps, get free ice cream'}
+          <p className="text-sm text-muted-foreground mt-1">
+            {isEmployee ? 'Scan customer QR codes to add stamps' : 'Earn stamps, get free rewards'}
           </p>
         </div>
 
         {/* Auth Card */}
-        <div className="card-vibrant bg-white/95 backdrop-blur-md p-8 md:p-10 shadow-2xl border border-border/50">
+        <div className="card-vibrant bg-card backdrop-blur-md p-8 md:p-10 shadow-2xl border border-border">
           {step === 'phone' ? (
             <form onSubmit={handlePhoneSubmit} className="space-y-6">
               <div>
@@ -149,7 +150,7 @@ export default function AuthPage() {
               </div>
 
               {error && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm font-medium animate-bounce-in">
+                <div className="p-4 bg-destructive/10 border border-destructive/30 rounded-lg text-destructive text-sm font-medium animate-bounce-in">
                   {error}
                 </div>
               )}
@@ -167,7 +168,7 @@ export default function AuthPage() {
                   <div className="w-full border-t border-border"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-foreground/60">or</span>
+                  <span className="px-2 bg-card text-muted-foreground">or</span>
                 </div>
               </div>
 
@@ -205,7 +206,7 @@ export default function AuthPage() {
               </div>
 
               {error && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm font-medium animate-bounce-in">
+                <div className="p-4 bg-destructive/10 border border-destructive/30 rounded-lg text-destructive text-sm font-medium animate-bounce-in">
                   {error}
                 </div>
               )}
@@ -233,10 +234,10 @@ export default function AuthPage() {
         </div>
 
         {/* Security Footer */}
-        <div className="mt-8 space-y-2 text-center text-xs text-foreground/60">
-          <p className="font-medium">🔒 Secure & Private</p>
+        <div className="mt-8 space-y-2 text-center text-xs text-muted-foreground">
+          <p className="font-medium text-accent">Secure & Private</p>
           <p>Your data is encrypted and never shared</p>
-          <p className="text-foreground/50">Pop Culture CLE © 2026</p>
+          <p className="text-muted-foreground/50">Pop Culture CLE</p>
         </div>
       </div>
     </main>
