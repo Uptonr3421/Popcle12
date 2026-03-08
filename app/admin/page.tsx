@@ -39,6 +39,7 @@ export default function AdminDashboard() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [offers, setOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loginError, setLoginError] = useState('');
 
   // New offer form state
   const [newOffer, setNewOffer] = useState({
@@ -46,6 +47,10 @@ export default function AdminDashboard() {
     description: '',
     discount: '',
     expiresAt: '',
+    geofenceEnabled: false,
+    lat: '',
+    lng: '',
+    radiusMeters: '200',
   });
 
   useEffect(() => {
@@ -57,16 +62,26 @@ export default function AdminDashboard() {
     }
   }, []);
 
-  const handleAdminLogin = (e: React.FormEvent) => {
+  const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     const digits = adminPhone.replace(/\D/g, '');
-    // Simple hardcoded admin check - in production use proper auth
-    if (digits === '2162457316') {
-      localStorage.setItem('adminPhone', digits);
-      setIsAuthenticated(true);
-      fetchDashboardData();
-    } else {
-      alert('Invalid admin credentials');
+    setLoginError('');
+    try {
+      const response = await fetch('/api/admin/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: digits }),
+      });
+      if (response.ok) {
+        localStorage.setItem('adminPhone', digits);
+        setIsAuthenticated(true);
+        fetchDashboardData();
+      } else {
+        setLoginError('Invalid admin credentials');
+      }
+    } catch (err) {
+      setLoginError('Network error. Please try again.');
+      console.error('Admin login error:', err);
     }
   };
 
@@ -108,12 +123,18 @@ export default function AdminDashboard() {
       const response = await fetch('/api/admin/offers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newOffer),
+        body: JSON.stringify({
+          ...newOffer,
+          geofence_enabled: newOffer.geofenceEnabled,
+          lat: newOffer.geofenceEnabled ? parseFloat(newOffer.lat) : null,
+          lng: newOffer.geofenceEnabled ? parseFloat(newOffer.lng) : null,
+          radius_meters: newOffer.geofenceEnabled ? parseInt(newOffer.radiusMeters) : 200,
+        }),
       });
 
       if (response.ok) {
         alert('Offer created successfully!');
-        setNewOffer({ title: '', description: '', discount: '', expiresAt: '' });
+        setNewOffer({ title: '', description: '', discount: '', expiresAt: '', geofenceEnabled: false, lat: '', lng: '', radiusMeters: '200' });
         await fetchDashboardData();
       } else {
         alert('Failed to create offer');
@@ -171,6 +192,12 @@ export default function AdminDashboard() {
                 <p className="text-xs text-foreground/60 mt-2">Enter admin credentials to access dashboard</p>
               </div>
 
+              {loginError && (
+                <div className="px-4 py-3 rounded-lg text-sm font-medium text-center bg-red-500/20 text-red-400 border border-red-500/30">
+                  {loginError}
+                </div>
+              )}
+
               <Button type="submit" className="btn-primary-glow w-full shadow-lg">
                 Login →
               </Button>
@@ -201,14 +228,20 @@ export default function AdminDashboard() {
 
       <div className="relative z-10">
         {/* Header */}
-        <header className="sticky top-0 z-20 bg-card/80 backdrop-blur-md border-b border-border shadow-sm">
+        <header className="sticky top-0 z-20 border-b shadow-sm" style={{ background: 'linear-gradient(to right, #0a0f1e, #0f1628)', borderBottomColor: 'rgba(70,187,255,0.2)' }}>
           <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-            <h1 className="text-2xl font-display font-bold text-primary">
-              Admin Dashboard
-            </h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-xl font-bold" style={{ color: '#e8edf5' }}>
+                Pop Culture CLE
+              </h1>
+              <span className="text-xs font-bold px-2 py-1 rounded" style={{ background: 'rgba(70,187,255,0.15)', color: '#46bbff', border: '1px solid rgba(70,187,255,0.4)', letterSpacing: '2px' }}>
+                ADMIN
+              </span>
+            </div>
             <button
               onClick={handleLogout}
-              className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors px-4 py-2 rounded hover:bg-primary/10"
+              className="text-sm font-medium transition-colors px-4 py-2 rounded"
+              style={{ color: 'rgba(232,237,245,0.4)' }}
             >
               Logout
             </button>
@@ -233,6 +266,11 @@ export default function AdminDashboard() {
                 {tab === 'offers' && '🎁 Offers'}
               </button>
             ))}
+            <Link href="/admin/deals">
+              <button className="px-6 py-3 font-semibold transition-colors border-b-2 border-transparent text-foreground/70 hover:text-foreground">
+                🗓️ Deals
+              </button>
+            </Link>
           </div>
 
           {/* Overview Tab */}
@@ -246,10 +284,10 @@ export default function AdminDashboard() {
                   { label: 'Rewards Redeemed', value: stats.rewardsRedeemed, icon: '🎁' },
                   { label: 'Active Offers', value: stats.activeOffers, icon: '🏷️' },
                 ].map((stat) => (
-                  <div key={stat.label} className="card-vibrant bg-card p-6 shadow-lg text-center border border-border">
+                  <div key={stat.label} style={{ background: '#0f1628', borderRadius: 16, padding: 24, textAlign: 'center', border: '1px solid rgba(70,187,255,0.12)' }}>
                     <div className="text-4xl mb-3">{stat.icon}</div>
-                    <p className="text-muted-foreground text-sm font-medium mb-2">{stat.label}</p>
-                    <p className="text-4xl font-display font-bold text-primary">
+                    <p className="text-sm font-medium mb-2" style={{ color: 'rgba(232,237,245,0.45)' }}>{stat.label}</p>
+                    <p className="text-4xl font-display font-bold" style={{ color: '#46bbff' }}>
                       {stat.value}
                     </p>
                   </div>
@@ -364,6 +402,55 @@ export default function AdminDashboard() {
                         required
                       />
                     </div>
+                  </div>
+
+                  <div className="space-y-4 p-4 bg-accent/10 rounded-lg border border-accent/30">
+                    <div className="flex items-center justify-between">
+                      <label className="text-sm font-semibold text-foreground">Enable Geofencing</label>
+                      <input
+                        type="checkbox"
+                        checked={newOffer.geofenceEnabled}
+                        onChange={(e) => setNewOffer({ ...newOffer, geofenceEnabled: e.target.checked })}
+                        className="w-5 h-5 accent-primary cursor-pointer"
+                      />
+                    </div>
+                    {newOffer.geofenceEnabled && (
+                      <div className="grid grid-cols-3 gap-3">
+                        <div>
+                          <label className="block text-xs font-semibold text-foreground mb-1">Latitude</label>
+                          <input
+                            type="number"
+                            step="0.0001"
+                            value={newOffer.lat}
+                            onChange={(e) => setNewOffer({ ...newOffer, lat: e.target.value })}
+                            placeholder="41.4384"
+                            className="w-full px-3 py-2 rounded-lg border border-border focus:border-primary focus:outline-none text-sm bg-input"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-foreground mb-1">Longitude</label>
+                          <input
+                            type="number"
+                            step="0.0001"
+                            value={newOffer.lng}
+                            onChange={(e) => setNewOffer({ ...newOffer, lng: e.target.value })}
+                            placeholder="-81.4096"
+                            className="w-full px-3 py-2 rounded-lg border border-border focus:border-primary focus:outline-none text-sm bg-input"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-foreground mb-1">Radius (m)</label>
+                          <input
+                            type="number"
+                            value={newOffer.radiusMeters}
+                            onChange={(e) => setNewOffer({ ...newOffer, radiusMeters: e.target.value })}
+                            placeholder="200"
+                            className="w-full px-3 py-2 rounded-lg border border-border focus:border-primary focus:outline-none text-sm bg-input"
+                          />
+                        </div>
+                      </div>
+                    )}
+                    <p className="text-xs text-muted-foreground">When enabled, customers nearby receive push notifications about this offer.</p>
                   </div>
 
                   <Button type="submit" disabled={loading} className="btn-primary-glow w-full">

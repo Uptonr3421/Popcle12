@@ -1,14 +1,9 @@
-import { createClient } from '@supabase/supabase-js';
+import { supabase, supabaseAdmin } from '@/lib/supabase';
 import { NextRequest, NextResponse } from 'next/server';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 export async function POST(request: NextRequest) {
   try {
-    const { phone, name, isEmployee } = await request.json();
+    const { phone, name, isEmployee, supabaseVerified } = await request.json();
 
     if (!phone || phone.length !== 10) {
       return NextResponse.json({ error: 'Invalid phone number' }, { status: 400 });
@@ -29,18 +24,37 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'User already exists' }, { status: 409 });
     }
 
+    // Build user record
+    const userRecord: Record<string, unknown> = {
+      phone,
+      name: name.trim(),
+      user_type: isEmployee ? 'employee' : 'customer',
+      stamp_count: 0,
+      created_at: new Date().toISOString(),
+    };
+
+    // If Supabase auth was used, try to link the auth user ID
+    if (supabaseVerified) {
+      try {
+        const e164Phone = `+1${phone}`;
+        const { data: authUsers } = await supabaseAdmin.auth.admin.listUsers();
+        const authUser = authUsers?.users?.find(
+          (u) => u.phone === e164Phone
+        );
+
+        if (authUser) {
+          userRecord.auth_id = authUser.id;
+        }
+      } catch (err) {
+        // Non-fatal: if we can't link the auth user, still create the DB record
+        console.warn('Could not link Supabase auth user:', err);
+      }
+    }
+
     // Create new user
     const { data: newUser, error } = await supabase
       .from('users')
-      .insert([
-        {
-          phone,
-          name: name.trim(),
-          user_type: isEmployee ? 'employee' : 'customer',
-          stamp_count: 0,
-          created_at: new Date().toISOString(),
-        },
-      ])
+      .insert([userRecord])
       .select()
       .single();
 

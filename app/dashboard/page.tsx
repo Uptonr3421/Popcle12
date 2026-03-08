@@ -14,6 +14,8 @@ export default function DashboardPage() {
   const [userName, setUserName] = useState('');
   const [showQR, setShowQR] = useState(true);
   const [nearStore, setNearStore] = useState(false);
+  const [redeeming, setRedeeming] = useState(false);
+  const [redeemMessage, setRedeemMessage] = useState('');
 
   useEffect(() => {
     if (!loading && !user) {
@@ -75,6 +77,31 @@ export default function DashboardPage() {
       setNearStore(distance < radiusKm);
     } catch (err) {
       setNearStore(false);
+    }
+  };
+
+  const handleRedeem = async () => {
+    if (!user?.phone) return;
+    setRedeeming(true);
+    setRedeemMessage('');
+    try {
+      const response = await fetch('/api/loyalty/redeem', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: user.phone }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setRedeemMessage(data.message || 'Free item claimed! Enjoy your reward!');
+        await fetchStampCount();
+      } else {
+        setRedeemMessage(data.error || 'Failed to claim reward. Please try again.');
+      }
+    } catch (err) {
+      setRedeemMessage('Network error. Please try again.');
+      console.error('Redeem error:', err);
+    } finally {
+      setRedeeming(false);
     }
   };
 
@@ -231,11 +258,26 @@ export default function DashboardPage() {
             {/* Action Buttons */}
             <div className="space-y-3">
               {isReady && (
-                <button className="btn-accent-glow w-full shadow-lg animate-bounce-in">
-                  🎁 Claim Free Item
-                </button>
+                <>
+                  <button
+                    onClick={handleRedeem}
+                    disabled={redeeming}
+                    className="btn-accent-glow w-full shadow-lg animate-bounce-in disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {redeeming ? 'Claiming...' : '🎁 Claim Free Item'}
+                  </button>
+                  {redeemMessage && (
+                    <div className={`px-4 py-3 rounded-lg text-sm font-medium text-center ${
+                      redeemMessage.includes('claimed') || redeemMessage.includes('reward')
+                        ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                        : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                    }`}>
+                      {redeemMessage}
+                    </div>
+                  )}
+                </>
               )}
-              <button 
+              <button
                 onClick={() => setShowQR(!showQR)}
                 className="btn-primary-glow w-full shadow-lg"
               >
@@ -273,6 +315,17 @@ export default function DashboardPage() {
             </section>
           )}
 
+          {/* Special Offers Section */}
+          <section className="card-vibrant bg-gradient-to-br from-primary/10 to-accent/10 p-8 text-center border border-border">
+            <h3 className="text-2xl font-display font-bold mb-3">Special Offers</h3>
+            <p className="text-foreground/70 mb-6">Check out exclusive deals for loyal customers</p>
+            <Link href="/offers">
+              <button className="btn-secondary-glow shadow-lg px-8 py-3 text-lg font-semibold">
+                View Offers →
+              </button>
+            </Link>
+          </section>
+
           {/* Store Info Section */}
           <section className="card-vibrant bg-gradient-to-br from-secondary/10 to-accent/10 p-8 text-center border border-border">
             <h3 className="text-xl font-display font-bold mb-4">Visit Our Store</h3>
@@ -291,6 +344,29 @@ export default function DashboardPage() {
                 className="px-6 py-3 bg-gradient-to-r from-secondary to-accent text-secondary-foreground rounded-lg font-semibold hover:shadow-lg hover:shadow-secondary/50 transition-all hover:scale-105"
               >
                 Email Us
+              </a>
+            </div>
+          </section>
+
+          {/* Social Links */}
+          <section className="card-vibrant bg-white p-6 text-center border border-border">
+            <p className="text-xs font-bold tracking-widest text-muted-foreground uppercase mb-4">Follow Us</p>
+            <div className="flex justify-center gap-4 flex-wrap">
+              <a href="https://www.instagram.com/popculturecle/" target="_blank" rel="noopener noreferrer"
+                 className="flex items-center gap-2 px-4 py-2 rounded-xl border-2 border-border font-semibold text-sm hover:border-primary hover:text-primary transition-colors">
+                📸 Instagram
+              </a>
+              <a href="https://www.facebook.com/popculturecle/" target="_blank" rel="noopener noreferrer"
+                 className="flex items-center gap-2 px-4 py-2 rounded-xl border-2 border-border font-semibold text-sm hover:border-primary hover:text-primary transition-colors">
+                👥 Facebook
+              </a>
+              <a href="https://www.linkedin.com/company/pop-culture-cle" target="_blank" rel="noopener noreferrer"
+                 className="flex items-center gap-2 px-4 py-2 rounded-xl border-2 border-border font-semibold text-sm hover:border-primary hover:text-primary transition-colors">
+                💼 LinkedIn
+              </a>
+              <a href="https://maps.google.com/?q=Pop+Culture+CLE+33549+Solon+Rd+Solon+OH" target="_blank" rel="noopener noreferrer"
+                 className="flex items-center gap-2 px-4 py-2 rounded-xl border-2 border-border font-semibold text-sm hover:border-primary hover:text-primary transition-colors">
+                📍 Find Us
               </a>
             </div>
           </section>

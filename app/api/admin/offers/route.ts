@@ -1,14 +1,14 @@
-import { createClient } from '@supabase/supabase-js';
+import { supabaseAdmin as supabase } from '@/lib/supabase';
 import { NextRequest, NextResponse } from 'next/server';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 export async function POST(req: NextRequest) {
   try {
-    const { title, description, discount, expiresAt } = await req.json();
+    // SQL migration required for geofence fields:
+    // ALTER TABLE offers
+    // ADD COLUMN IF NOT EXISTS lat float8,
+    // ADD COLUMN IF NOT EXISTS lng float8,
+    // ADD COLUMN IF NOT EXISTS radius_meters integer DEFAULT 200;
+    const { title, description, discount, expiresAt, geofence_enabled, lat, lng, radius_meters } = await req.json();
 
     if (!title || !description || !discount || !expiresAt) {
       return NextResponse.json(
@@ -32,6 +32,10 @@ export async function POST(req: NextRequest) {
           free_item: isFreeItem,
           expires_at: expiresAt,
           active: true,
+          geofence_enabled: geofence_enabled ?? false,
+          lat: lat ?? null,
+          lng: lng ?? null,
+          radius_meters: radius_meters ?? 200,
           created_at: new Date().toISOString(),
         },
       ])

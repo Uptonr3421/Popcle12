@@ -1,0 +1,56 @@
+{
+  "expo": {
+    "name": "Pop Culture CLE",
+    "slug": "popculturecle-loyalty",
+    "scheme": "popculturecle",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0f0a1a"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "io.alignment-ai.popculturecle",
+      "infoPlist": {
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Used to notify you of specials when you're near the store.",
+        "NSLocationWhenInUseUsageDescription": "Used to show you nearby specials.",
+        "NSCameraUsageDescription": "Used to scan customer QR codes."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0f0a1a"
+      },
+      "package": "io.alignment_ai.popculturecle",
+      "permissions": ["ACCESS_BACKGROUND_LOCATION", "ACCESS_FINE_LOCATION", "CAMERA"]
+    },
+    "plugins": [
+      [
+        "expo-router",
+        {
+          "root": "app"
+        }
+      ],
+      "expo-notifications",
+      [
+        "expo-location",
+        {
+          "isAndroidBackgroundLocationEnabled": true
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow Pop Culture CLE to use your camera to scan QR codes."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
