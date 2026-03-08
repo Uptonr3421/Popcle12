@@ -1,7 +1,13 @@
 import { supabaseAdmin } from '@/lib/supabase';
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyAdmin } from '@/lib/api-helpers';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const { isAdmin, error: authError } = await verifyAdmin(req);
+  if (!isAdmin) {
+    return NextResponse.json({ error: authError || 'Unauthorized' }, { status: 403 });
+  }
+
   const { data, error } = await supabaseAdmin
     .from('scheduled_pushes')
     .select('*')
@@ -13,6 +19,11 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
+    const { isAdmin, error: authError } = await verifyAdmin(req);
+    if (!isAdmin) {
+      return NextResponse.json({ error: authError || 'Unauthorized' }, { status: 403 });
+    }
+
     const { title, body, scheduledFor, recipientType } = await req.json();
 
     if (!title || !scheduledFor) {
@@ -40,6 +51,11 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
+    const { isAdmin, error: authError } = await verifyAdmin(req);
+    if (!isAdmin) {
+      return NextResponse.json({ error: authError || 'Unauthorized' }, { status: 403 });
+    }
+
     const { id } = await req.json();
     if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
 

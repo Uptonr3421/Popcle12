@@ -87,10 +87,12 @@ export default function AdminDashboard() {
 
   const fetchDashboardData = async () => {
     setLoading(true);
+    const phone = localStorage.getItem('adminPhone') || adminPhone;
+    const adminHeaders = { 'x-admin-phone': phone };
     try {
       const [statsRes, customersRes, offersRes] = await Promise.all([
-        fetch('/api/admin/stats'),
-        fetch('/api/admin/customers'),
+        fetch('/api/admin/stats', { headers: adminHeaders }),
+        fetch('/api/admin/customers', { headers: adminHeaders }),
         fetch('/api/offers'),
       ]);
 
@@ -120,9 +122,10 @@ export default function AdminDashboard() {
     setLoading(true);
 
     try {
+      const phone = localStorage.getItem('adminPhone') || adminPhone;
       const response = await fetch('/api/admin/offers', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-admin-phone': phone },
         body: JSON.stringify({
           ...newOffer,
           geofence_enabled: newOffer.geofenceEnabled,

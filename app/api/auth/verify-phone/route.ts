@@ -1,14 +1,25 @@
 import { supabase } from '@/lib/supabase';
 import { NextRequest, NextResponse } from 'next/server';
+import { sanitizePhone, checkRateLimit } from '@/lib/api-helpers';
 
 export async function POST(req: NextRequest) {
   try {
-    const { phone, isEmployee, supabaseVerified } = await req.json();
+    const { phone: rawPhone, isEmployee, supabaseVerified } = await req.json();
 
-    if (!phone || phone.length !== 10) {
+    const phone = sanitizePhone(rawPhone);
+    if (!phone) {
       return NextResponse.json(
         { error: 'Invalid phone number' },
         { status: 400 }
+      );
+    }
+
+    // Rate limit: 10 verify attempts per phone per hour
+    const rateCheck = checkRateLimit(`verify:${phone}`, 10, 60 * 60 * 1000);
+    if (!rateCheck.allowed) {
+      return NextResponse.json(
+        { error: 'Too many attempts. Try again later.', retryAfter: rateCheck.retryAfter },
+        { status: 429 }
       );
     }
 

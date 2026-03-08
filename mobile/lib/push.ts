@@ -80,19 +80,26 @@ export async function sendPushNotification(
  * Admin only — call from admin screen.
  */
 export async function broadcastToAllCustomers(title: string, body: string) {
-  const { data: customers } = await supabase
+  const { data: customers, error } = await supabase
     .from('users')
     .select('expo_push_token')
     .eq('user_type', 'customer')
     .not('expo_push_token', 'is', null);
 
-  if (!customers || customers.length === 0) return { sent: 0 };
+  if (error) {
+    console.error('Failed to fetch customers for broadcast:', error.message);
+    return { sent: 0, failed: 0, total: 0 };
+  }
 
-  await Promise.allSettled(
-    customers
-      .filter((c) => c.expo_push_token)
-      .map((c) => sendPushNotification(c.expo_push_token!, title, body))
+  if (!customers || customers.length === 0) return { sent: 0, failed: 0, total: 0 };
+
+  const validCustomers = customers.filter((c) => c.expo_push_token);
+  const results = await Promise.allSettled(
+    validCustomers.map((c) => sendPushNotification(c.expo_push_token!, title, body))
   );
 
-  return { sent: customers.length };
+  const sent = results.filter(r => r.status === 'fulfilled').length;
+  const failed = results.filter(r => r.status === 'rejected').length;
+
+  return { sent, failed, total: validCustomers.length };
 }

@@ -1,21 +1,40 @@
 import { supabase } from '@/lib/supabase';
 import { NextRequest, NextResponse } from 'next/server';
+import { sanitizePhone, checkRateLimit } from '@/lib/api-helpers';
 
 export async function POST(req: NextRequest) {
   try {
-    const { customerPhone, employeePhone } = await req.json();
+    const { customerPhone: rawCustomerPhone, employeePhone: rawEmployeePhone } = await req.json();
 
-    if (!customerPhone || !employeePhone) {
+    if (!rawCustomerPhone || !rawEmployeePhone) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
       );
     }
 
-    // Get customer
+    const customerPhone = sanitizePhone(rawCustomerPhone);
+    const employeePhone = sanitizePhone(rawEmployeePhone);
+    if (!customerPhone || !employeePhone) {
+      return NextResponse.json(
+        { error: 'Invalid phone number format' },
+        { status: 400 }
+      );
+    }
+
+    // Rate limit: 10 stamps per employee per minute
+    const rateCheck = checkRateLimit(`stamp:${employeePhone}`, 10, 60 * 1000);
+    if (!rateCheck.allowed) {
+      return NextResponse.json(
+        { error: 'Rate limit exceeded. Try again shortly.', retryAfter: rateCheck.retryAfter },
+        { status: 429 }
+      );
+    }
+
+    // Look up customer
     const { data: customer, error: customerError } = await supabase
       .from('users')
-      .select('id, name, stamp_count, user_type')
+      .select('id, name')
       .eq('phone', customerPhone)
       .single();
 
@@ -40,37 +59,28 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Increment stamp count (max 10)
-    const newStampCount = Math.min((customer.stamp_count || 0) + 1, 10);
+    // Atomic stamp increment via Supabase RPC — prevents race conditions
+    const { data: rpcResult, error: rpcError } = await supabase.rpc('add_stamp', {
+      p_customer_id: customer.id,
+      p_employee_id: employee.id,
+    });
 
-    // Update customer
-    const { error: updateError } = await supabase
-      .from('users')
-      .update({ stamp_count: newStampCount })
-      .eq('id', customer.id);
-
-    if (updateError) {
-      throw updateError;
+    if (rpcError) {
+      throw rpcError;
     }
 
-    // Record the stamp transaction
-    await supabase
-      .from('loyalty_records')
-      .insert([
-        {
-          user_id: customer.id,
-          customer_id: customer.id,
-          employee_id: employee.id,
-          action: 'stamp_added',
-          stamp_added_at: new Date().toISOString(),
-        },
-      ]);
+    if (!rpcResult.success) {
+      return NextResponse.json(
+        { error: rpcResult.error, cooldown: rpcResult.cooldown || false },
+        { status: 409 }
+      );
+    }
 
     return NextResponse.json({
       success: true,
       customerName: customer.name || 'Customer',
-      newStampCount,
-      rewardReady: newStampCount >= 10,
+      newStampCount: rpcResult.new_count,
+      rewardReady: rpcResult.celebration || false,
     });
   } catch (error) {
     console.error('Add stamp error:', error);

@@ -61,9 +61,44 @@ export default function AdminOffersScreen() {
       return;
     }
 
-    if (geofenceEnabled && (!offerLat.trim() || !offerLng.trim())) {
-      Alert.alert('Missing Geofence Data', 'Please enter latitude and longitude for the geofence.');
+    if (offerTitle.trim().length > 200) {
+      Alert.alert('Title Too Long', 'Title must be 200 characters or less.');
       return;
+    }
+
+    if (offerDescription.trim().length > 1000) {
+      Alert.alert('Description Too Long', 'Description must be 1000 characters or less.');
+      return;
+    }
+
+    if (discountType === 'percentage' && discountValue.trim()) {
+      const pct = parseInt(discountValue, 10);
+      if (isNaN(pct) || pct < 0 || pct > 100) {
+        Alert.alert('Invalid Discount', 'Discount must be between 0% and 100%.');
+        return;
+      }
+    }
+
+    if (geofenceEnabled) {
+      if (!offerLat.trim() || !offerLng.trim()) {
+        Alert.alert('Missing Geofence Data', 'Please enter latitude and longitude for the geofence.');
+        return;
+      }
+      const lat = parseFloat(offerLat);
+      const lng = parseFloat(offerLng);
+      const radius = parseInt(offerRadius, 10);
+      if (isNaN(lat) || lat < -90 || lat > 90) {
+        Alert.alert('Invalid Latitude', 'Latitude must be between -90 and 90.');
+        return;
+      }
+      if (isNaN(lng) || lng < -180 || lng > 180) {
+        Alert.alert('Invalid Longitude', 'Longitude must be between -180 and 180.');
+        return;
+      }
+      if (isNaN(radius) || radius < 50 || radius > 5000) {
+        Alert.alert('Invalid Radius', 'Radius must be between 50 and 5000 meters.');
+        return;
+      }
     }
 
     setCreating(true);
@@ -158,6 +193,7 @@ export default function AdminOffersScreen() {
             onChangeText={setOfferTitle}
             placeholder="e.g., Free Topping Tuesday"
             placeholderTextColor="rgba(232,237,245,0.2)"
+            accessibilityLabel="Offer title"
           />
 
           <Text style={styles.label}>Description</Text>
@@ -169,6 +205,7 @@ export default function AdminOffersScreen() {
             placeholderTextColor="rgba(232,237,245,0.2)"
             multiline
             numberOfLines={3}
+            accessibilityLabel="Offer description"
           />
 
           <Text style={styles.label}>Discount Type</Text>
@@ -197,6 +234,7 @@ export default function AdminOffersScreen() {
                 placeholder="e.g., 20"
                 placeholderTextColor="rgba(232,237,245,0.2)"
                 keyboardType="numeric"
+                accessibilityLabel="Discount percentage"
               />
             </>
           )}
@@ -208,6 +246,7 @@ export default function AdminOffersScreen() {
             onChangeText={setExpiresAt}
             placeholder="e.g., 2026-12-31 23:59"
             placeholderTextColor="rgba(232,237,245,0.2)"
+            accessibilityLabel="Expiration date and time"
           />
 
           {/* Geofence Section */}
@@ -235,6 +274,7 @@ export default function AdminOffersScreen() {
                   placeholder="e.g., 41.4384"
                   placeholderTextColor="rgba(232,237,245,0.2)"
                   keyboardType="decimal-pad"
+                  accessibilityLabel="Geofence latitude"
                 />
 
                 <Text style={styles.label}>Longitude</Text>
@@ -245,6 +285,7 @@ export default function AdminOffersScreen() {
                   placeholder="e.g., -81.4096"
                   placeholderTextColor="rgba(232,237,245,0.2)"
                   keyboardType="decimal-pad"
+                  accessibilityLabel="Geofence longitude"
                 />
 
                 <Text style={styles.label}>Radius (meters)</Text>
@@ -255,6 +296,7 @@ export default function AdminOffersScreen() {
                   placeholder="200"
                   placeholderTextColor="rgba(232,237,245,0.2)"
                   keyboardType="numeric"
+                  accessibilityLabel="Geofence radius in meters"
                 />
               </View>
             )}
@@ -292,6 +334,8 @@ export default function AdminOffersScreen() {
                 style={[styles.toggleButton, offer.active ? styles.toggleActive : styles.toggleInactive]}
                 onPress={() => handleToggleActive(offer)}
                 disabled={toggling === offer.id}
+                accessibilityRole="switch"
+                accessibilityState={{ checked: offer.active }}
               >
                 {toggling === offer.id
                   ? <ActivityIndicator size="small" color="#e8edf5" />

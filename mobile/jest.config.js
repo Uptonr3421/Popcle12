@@ -10,6 +10,8 @@ module.exports = {
     // not supported in Jest's CommonJS environment (Expo 55 + Jest 30 incompatibility)
     '^expo/src/winter$': '<rootDir>/__mocks__/expo-winter-stub.js',
     '^expo/src/winter/(.*)$': '<rootDir>/__mocks__/expo-winter-stub.js',
+    // Stub binary asset imports (sound files) so require() doesn't throw in tests
+    '\\.(wav|mp3|aac|ogg)$': '<rootDir>/__mocks__/asset-stub.js',
   },
   testMatch: ['**/__tests__/**/*.test.{ts,tsx}'],
   collectCoverageFrom: [

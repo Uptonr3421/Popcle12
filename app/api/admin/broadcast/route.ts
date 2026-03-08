@@ -10,9 +10,15 @@
 
 import { supabaseAdmin } from '@/lib/supabase';
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyAdmin, sanitizeString } from '@/lib/api-helpers';
 
 export async function POST(req: NextRequest) {
   try {
+    const { isAdmin, error: authError } = await verifyAdmin(req);
+    if (!isAdmin) {
+      return NextResponse.json({ error: authError || 'Unauthorized' }, { status: 403 });
+    }
+
     const { title, body } = await req.json();
 
     if (!title || !body) {
@@ -20,6 +26,12 @@ export async function POST(req: NextRequest) {
         { error: 'title and body are required' },
         { status: 400 }
       );
+    }
+
+    const cleanTitle = sanitizeString(title, 200);
+    const cleanBody = sanitizeString(body, 1000);
+    if (!cleanTitle || !cleanBody) {
+      return NextResponse.json({ error: 'Title and body must not be empty' }, { status: 400 });
     }
 
     // Fetch all customers with a registered push token
@@ -56,7 +68,7 @@ export async function POST(req: NextRequest) {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${serviceRoleKey}`,
             },
-            body: JSON.stringify({ token: c.expo_push_token, title, body }),
+            body: JSON.stringify({ token: c.expo_push_token, title: cleanTitle, body: cleanBody }),
           })
         )
     );

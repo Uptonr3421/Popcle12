@@ -53,6 +53,11 @@ export default function AdminDeals() {
     title: '', body: '', scheduledFor: '', recipientType: 'all',
   });
 
+  const getAdminHeaders = (): Record<string, string> => {
+    const phone = localStorage.getItem('adminPhone') || '';
+    return { 'x-admin-phone': phone };
+  };
+
   useEffect(() => {
     const admin = localStorage.getItem('adminPhone');
     if (!admin) { router.push('/admin'); return; }
@@ -61,12 +66,12 @@ export default function AdminDeals() {
   }, []);
 
   const fetchDeals = async () => {
-    const res = await fetch('/api/admin/deals');
+    const res = await fetch('/api/admin/deals', { headers: getAdminHeaders() });
     if (res.ok) { const d = await res.json(); setDeals(d.deals || []); }
   };
 
   const fetchPushes = async () => {
-    const res = await fetch('/api/admin/scheduled-pushes');
+    const res = await fetch('/api/admin/scheduled-pushes', { headers: getAdminHeaders() });
     if (res.ok) { const d = await res.json(); setPushes(d.pushes || []); }
   };
 
@@ -75,7 +80,7 @@ export default function AdminDeals() {
     setLoading(true);
     const res = await fetch('/api/admin/deals', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...getAdminHeaders() },
       body: JSON.stringify({
         ...form,
         discountValue: Number(form.discountValue),
@@ -95,7 +100,7 @@ export default function AdminDeals() {
   const handleToggleDeal = async (id: string, active: boolean) => {
     await fetch('/api/admin/deals', {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...getAdminHeaders() },
       body: JSON.stringify({ id, active: !active }),
     });
     await fetchDeals();
@@ -106,7 +111,7 @@ export default function AdminDeals() {
     setLoading(true);
     const res = await fetch('/api/admin/scheduled-pushes', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...getAdminHeaders() },
       body: JSON.stringify(pushForm),
     });
     if (res.ok) {
@@ -119,7 +124,7 @@ export default function AdminDeals() {
   const handleDeletePush = async (id: string) => {
     await fetch('/api/admin/scheduled-pushes', {
       method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...getAdminHeaders() },
       body: JSON.stringify({ id }),
     });
     await fetchPushes();

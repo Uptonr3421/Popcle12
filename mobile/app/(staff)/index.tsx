@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
-  Animated, Dimensions,
+  Animated, Dimensions, Linking,
 } from 'react-native';
 import { CameraView, Camera } from 'expo-camera';
 import { supabase } from '@/lib/supabase';
@@ -11,16 +11,32 @@ import { getActiveDeals, getStaffInstruction, ActiveDeal } from '@/lib/deals';
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
 
+function getTodayKey(): string {
+  return new Date().toISOString().split('T')[0];
+}
+
 export default function StaffScanner() {
   const { phone } = useAuth();
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState(false);
   const [sessionCount, setSessionCount] = useState(0);
+  const [sessionDate, setSessionDate] = useState(getTodayKey());
   const [activeDeals, setActiveDeals] = useState<ActiveDeal[]>([]);
   const [flash, setFlash] = useState<{ visible: boolean; type: 'success' | 'error'; message: string }>({
     visible: false, type: 'success', message: '',
   });
   const flashAnim = useRef(new Animated.Value(0)).current;
+  const lastScannedPhone = useRef<string | null>(null);
+  const lastScannedTime = useRef<number>(0);
+
+  useEffect(() => {
+    // Daily reset: if stored date doesn't match today, reset count
+    const today = getTodayKey();
+    if (sessionDate !== today) {
+      setSessionCount(0);
+      setSessionDate(today);
+    }
+  }, [sessionDate]);
 
   useEffect(() => {
     Camera.requestCameraPermissionsAsync().then(({ status }) => {
@@ -54,14 +70,27 @@ export default function StaffScanner() {
     if (customerPhone.length !== 10) {
       await playError();
       showFlash('error', 'Invalid QR Code');
-      setTimeout(() => setScanned(false), 2000);
+      setTimeout(() => setScanned(false), 5000);
+      return;
+    }
+
+    // Duplicate scan protection: same phone within 60 seconds
+    const now = Date.now();
+    if (lastScannedPhone.current === customerPhone && now - lastScannedTime.current < 60000) {
+      showFlash('error', 'Already scanned this customer');
+      setTimeout(() => setScanned(false), 5000);
       return;
     }
 
     try {
-      const { data: customer } = await supabase
-        .from('users').select('id, name, stamp_count')
-        .eq('phone', customerPhone).single();
+      // Look up customer and staff in parallel
+      const [customerResult, staffResult] = await Promise.all([
+        supabase.from('users').select('id, name').eq('phone', customerPhone).single(),
+        supabase.from('users').select('id').eq('phone', phone).single(),
+      ]);
+
+      const customer = customerResult.data;
+      const staff = staffResult.data;
 
       if (!customer) {
         await playError();
@@ -70,24 +99,33 @@ export default function StaffScanner() {
         return;
       }
 
-      const { data: staff } = await supabase
-        .from('users').select('id').eq('phone', phone).single();
+      // Atomic stamp increment via Supabase RPC — prevents race conditions
+      const { data, error: rpcError } = await supabase.rpc('add_stamp', {
+        p_customer_id: customer.id,
+        p_employee_id: staff?.id,
+      });
 
-      const newCount = Math.min((customer.stamp_count || 0) + 1, 10);
+      if (rpcError) throw rpcError;
 
-      await supabase.from('users').update({ stamp_count: newCount }).eq('id', customer.id);
-      await supabase.from('loyalty_records').insert([{
-        customer_id: customer.id,
-        employee_id: staff?.id,
-        action: 'stamp_added',
-        stamp_added_at: new Date().toISOString(),
-      }]);
+      if (!data.success) {
+        if (data.cooldown) {
+          await playError();
+          showFlash('error', 'Already scanned — wait 60 seconds');
+        } else {
+          await playError();
+          showFlash('error', data.error || 'Stamp failed');
+        }
+        setTimeout(() => setScanned(false), 2500);
+        return;
+      }
 
       await playSuccess();
       setSessionCount(c => c + 1);
+      lastScannedPhone.current = customerPhone;
+      lastScannedTime.current = Date.now();
 
-      let msg = `${customer.name || 'Customer'} — Stamp ${newCount}/10`;
-      if (newCount >= 10) msg = `${customer.name || 'Customer'} — REWARD READY! 🎉`;
+      let msg = `${customer.name || 'Customer'} — Stamp ${data.new_count}/10`;
+      if (data.celebration) msg = `${customer.name || 'Customer'} — REWARD READY! 🎉`;
 
       // Append active deal instructions
       if (activeDeals.length > 0) {
@@ -100,7 +138,7 @@ export default function StaffScanner() {
       showFlash('error', 'Connection Error');
     }
 
-    setTimeout(() => setScanned(false), 2500);
+    setTimeout(() => setScanned(false), 5000);
   };
 
   const handleSignOut = () => supabase.auth.signOut();
@@ -114,8 +152,25 @@ export default function StaffScanner() {
   }
   if (hasPermission === false) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.permText}>Camera access denied.{'\n'}Enable in Settings.</Text>
+      <View style={styles.container} accessibilityRole="alert">
+        <Text style={styles.permText}>Camera access denied.{'\n'}Enable in Settings to scan QR codes.</Text>
+        <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 16, marginTop: 24 }}>
+          <TouchableOpacity
+            style={{ backgroundColor: '#ffcc33', borderRadius: 12, paddingHorizontal: 20, paddingVertical: 12 }}
+            onPress={() => Linking.openSettings()}
+          >
+            <Text style={{ color: '#1f1715', fontWeight: '800', fontSize: 15 }}>Open Settings</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{ backgroundColor: 'rgba(255,204,51,0.15)', borderRadius: 12, paddingHorizontal: 20, paddingVertical: 12, borderWidth: 1, borderColor: 'rgba(255,204,51,0.4)' }}
+            onPress={async () => {
+              const { status } = await Camera.requestCameraPermissionsAsync();
+              setHasPermission(status === 'granted');
+            }}
+          >
+            <Text style={{ color: '#ffcc33', fontWeight: '800', fontSize: 15 }}>Retry</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
@@ -136,7 +191,7 @@ export default function StaffScanner() {
             </View>
           )}
         </View>
-        <View style={styles.headerCenter}>
+        <View style={styles.headerCenter} accessibilityLabel={`${sessionCount} stamps added today`}>
           <Text style={styles.sessionCount}>{sessionCount}</Text>
           <Text style={styles.sessionLabel}>today</Text>
         </View>
@@ -158,7 +213,7 @@ export default function StaffScanner() {
       )}
 
       {/* Camera */}
-      <View style={styles.cameraContainer}>
+      <View style={styles.cameraContainer} accessibilityLabel="QR code scanner camera. Point at customer's QR code." accessibilityRole="image">
         <CameraView
           style={styles.camera}
           facing="back"
@@ -193,6 +248,8 @@ export default function StaffScanner() {
               opacity: flashAnim,
             },
           ]}
+          accessibilityRole="alert"
+          accessibilityLabel={flash.type === 'success' ? 'Stamp added successfully' : 'Scan failed'}
         >
           <Text style={styles.flashIcon}>{flash.type === 'success' ? '✓' : '✕'}</Text>
           <Text style={styles.flashMessage}>{flash.message}</Text>

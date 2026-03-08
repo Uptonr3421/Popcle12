@@ -67,6 +67,8 @@ export default function ConnectScreen() {
             style={styles.linkCard}
             onPress={() => openLink(link.url)}
             activeOpacity={0.75}
+            accessibilityLabel={`Open ${link.platform} - ${link.handle}`}
+            accessibilityRole="link"
           >
             <View style={[styles.iconBg, { backgroundColor: `${link.color}18` }]}>
               <FontAwesome5 name={link.iconName} size={22} color={link.color} />
@@ -85,16 +87,16 @@ export default function ConnectScreen() {
         <Text style={styles.storeTitle}>Pop Culture CLE</Text>
         <Text style={styles.storeAddress}>33549 Solon Rd{'\n'}Solon, OH 44139</Text>
 
-        <TouchableOpacity onPress={openDirections} style={styles.directionsBtn}>
+        <TouchableOpacity onPress={openDirections} style={styles.directionsBtn} accessibilityLabel="Get directions to Pop Culture CLE" accessibilityRole="link">
           <Ionicons name="navigate" size={18} color="#fff" />
           <Text style={styles.directionsBtnText}>Get Directions</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => openLink('tel:+12162457316')} style={styles.callBtn}>
+        <TouchableOpacity onPress={() => openLink('tel:+12162457316')} style={styles.callBtn} accessibilityLabel="Call Pop Culture CLE at 216-245-7316" accessibilityRole="link">
           <Ionicons name="call" size={16} color="#fff" />
           <Text style={styles.callBtnText}>(216) 245-7316</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => openLink('mailto:info@popculturecle.com')} style={styles.emailBtn}>
+        <TouchableOpacity onPress={() => openLink('mailto:info@popculturecle.com')} style={styles.emailBtn} accessibilityLabel="Email Pop Culture CLE" accessibilityRole="link">
           <Ionicons name="mail-outline" size={16} color="#ff3b8d" />
           <Text style={styles.emailBtnText}>info@popculturecle.com</Text>
         </TouchableOpacity>

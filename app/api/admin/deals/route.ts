@@ -41,9 +41,15 @@
 
 import { supabaseAdmin } from '@/lib/supabase';
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyAdmin } from '@/lib/api-helpers';
 
 export async function POST(req: NextRequest) {
   try {
+    const { isAdmin, error: authError } = await verifyAdmin(req);
+    if (!isAdmin) {
+      return NextResponse.json({ error: authError || 'Unauthorized' }, { status: 403 });
+    }
+
     const {
       title, description,
       discountType, discountValue, discountLabel,
@@ -106,8 +112,13 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    const { isAdmin, error: authError } = await verifyAdmin(req);
+    if (!isAdmin) {
+      return NextResponse.json({ error: authError || 'Unauthorized' }, { status: 403 });
+    }
+
     // Return all deals sorted by starts_at desc, with status computed
     const { data: deals, error } = await supabaseAdmin
       .from('offers')
@@ -138,6 +149,11 @@ export async function GET() {
 
 export async function PATCH(req: NextRequest) {
   try {
+    const { isAdmin, error: authError } = await verifyAdmin(req);
+    if (!isAdmin) {
+      return NextResponse.json({ error: authError || 'Unauthorized' }, { status: 403 });
+    }
+
     const { id, active } = await req.json();
     if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
 

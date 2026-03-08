@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet,
-  ActivityIndicator, Alert,
+  Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import QRCode from 'react-native-qrcode-svg';
@@ -9,20 +9,24 @@ import * as Location from 'expo-location';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { registerPushToken } from '@/lib/push';
+import { cacheStamps, getCachedStamps } from '@/lib/cache';
 import {
   startGeofenceMonitoring,
   stopGeofenceMonitoring,
   distanceMeters,
   STORE_LOCATION,
 } from '@/lib/geofence';
+import { checkAndPromptReview } from '@/lib/review';
+import StampCardSkeleton from '@/components/StampCardSkeleton';
 
 export default function CustomerHome() {
   const { phone } = useAuth();
-  const [stampCount, setStampCount] = useState(0);
+  const [stampCount, setStampCount] = useState<number>(0);
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(true);
   const [redeeming, setRedeeming] = useState(false);
   const [nearStore, setNearStore] = useState(false);
+  const [isOffline, setIsOffline] = useState(false);
   const locationWatchRef = useRef<Location.LocationSubscription | null>(null);
 
   useEffect(() => {
@@ -43,7 +47,7 @@ export default function CustomerHome() {
           filter: `phone=eq.${phone}`,
         },
         (payload: any) => {
-          const newCount: number = payload.new.stamp_count ?? 0;
+          const newCount: number = payload?.new?.stamp_count ?? 0;
           setStampCount((prev) => {
             if (newCount > prev) {
               import('@/lib/feedback').then(({ playCelebration }) =>
@@ -52,6 +56,7 @@ export default function CustomerHome() {
             }
             return newCount;
           });
+          checkAndPromptReview(newCount);
         }
       )
       .subscribe();
@@ -98,23 +103,40 @@ export default function CustomerHome() {
 
   const fetchUser = async () => {
     if (!phone) return;
-    const { data } = await supabase
-      .from('users')
-      .select('name, stamp_count')
-      .eq('phone', phone)
-      .single();
-    if (data) {
-      setName(data.name || 'Customer');
-      setStampCount(data.stamp_count || 0);
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('name, stamp_count')
+        .eq('phone', phone)
+        .single();
+      if (error) throw error;
+      if (data) {
+        setName(data.name || 'Customer');
+        setStampCount(data.stamp_count || 0);
+        setIsOffline(false);
+
+        // Cache stamps for offline use
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user?.id) {
+          cacheStamps(session.user.id, data.stamp_count || 0);
+          // Save for background geofence task
+          const AsyncStorage = (await import('@react-native-async-storage/async-storage')).default;
+          await AsyncStorage.setItem('@popcle_user_id', session.user.id);
+        }
+      }
+    } catch (err) {
+      console.warn('Supabase fetch failed, trying cache:', err);
+      // Fall back to cached stamps
+      const { data: { session } } = await supabase.auth.getSession().catch(() => ({ data: { session: null } }));
+      if (session?.user?.id) {
+        const cached = await getCachedStamps(session.user.id);
+        if (cached !== null) {
+          setStampCount(cached);
+          setIsOffline(true);
+        }
+      }
     }
     setLoading(false);
-
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session?.user?.id) {
-      // Save for background geofence task
-      const AsyncStorage = (await import('@react-native-async-storage/async-storage')).default;
-      await AsyncStorage.setItem('@popcle_user_id', session.user.id);
-    }
   };
 
   const handleRedeem = async () => {
@@ -127,28 +149,37 @@ export default function CustomerHome() {
         {
           text: 'Confirm',
           onPress: async () => {
+            if (!phone) return;
             setRedeeming(true);
             try {
-              const { error } = await supabase
+              // Get user ID for RPC call
+              const { data: userData } = await supabase
                 .from('users')
-                .update({ stamp_count: 0 })
-                .eq('phone', phone);
-              if (!error) {
-                const { data: userData } = await supabase
-                  .from('users')
-                  .select('id')
-                  .eq('phone', phone)
-                  .single();
-                await supabase.from('loyalty_records').insert([
-                  {
-                    customer_id: userData?.id,
-                    action: 'reward_claimed',
-                    stamp_added_at: new Date().toISOString(),
-                  },
-                ]);
+                .select('id')
+                .eq('phone', phone)
+                .single();
+
+              if (!userData?.id) throw new Error('User not found');
+
+              // Atomic redemption via Supabase RPC — prevents double redeem
+              const { data, error } = await supabase.rpc('redeem_reward', {
+                p_user_id: userData.id,
+              });
+
+              if (error) throw error;
+
+              if (data?.success) {
                 setStampCount(0);
                 Alert.alert('Redeemed!', 'Enjoy your free item! Stamps reset to 0.');
+              } else {
+                Alert.alert('Cannot Redeem', data?.error || 'Please try again');
               }
+            } catch (err) {
+              Alert.alert(
+                'Redemption Failed',
+                "You're offline or something went wrong. Please redeem in store."
+              );
+              // Don't reset local stamp count on failure
             } finally {
               setRedeeming(false);
             }
@@ -165,11 +196,7 @@ export default function CustomerHome() {
   };
 
   if (loading) {
-    return (
-      <View style={styles.loading}>
-        <ActivityIndicator size="large" color="#ff3b8d" />
-      </View>
-    );
+    return <StampCardSkeleton />;
   }
 
   const isReady = stampCount >= 10;
@@ -180,7 +207,7 @@ export default function CustomerHome() {
       {/* ── Header ──────────────────────────────────────────────────────── */}
       <View style={styles.header}>
         <Text style={styles.headerLogo}>Pop Culture CLE</Text>
-        <View style={styles.headerBadge}>
+        <View style={styles.headerBadge} accessibilityLabel={`You have ${stampCount} out of 10 stamps`} accessibilityRole="text">
           <Text style={styles.headerBadgeText}>{stampCount}/10 stamps</Text>
         </View>
       </View>
@@ -192,6 +219,13 @@ export default function CustomerHome() {
             <Text style={styles.nearBannerText}>
               📍 You're near Pop Culture CLE! Check out today's offers!
             </Text>
+          </View>
+        )}
+
+        {/* ── Offline Banner ───────────────────────────────────────────── */}
+        {isOffline && (
+          <View style={styles.offlineBanner} accessibilityRole="alert" accessibilityLabel="You are currently offline. Showing cached data.">
+            <Text style={styles.offlineBannerText}>Offline</Text>
           </View>
         )}
 
@@ -214,6 +248,7 @@ export default function CustomerHome() {
                   styles.stampCircle,
                   i < stampCount ? styles.stampFilled : styles.stampEmpty,
                 ]}
+                accessibilityLabel={`Stamp ${i + 1}: ${i < stampCount ? 'earned' : 'empty'}`}
               >
                 {i < stampCount ? (
                   <Text style={styles.stampCheckmark}>✓</Text>
@@ -249,6 +284,9 @@ export default function CustomerHome() {
             disabled={!isReady || redeeming}
             style={!isReady || redeeming ? styles.btnDisabled : undefined}
             activeOpacity={0.85}
+            accessibilityLabel="Claim your free item reward"
+            accessibilityRole="button"
+            accessibilityState={{ disabled: !isReady || redeeming }}
           >
             <LinearGradient
               colors={['#ff3b8d', '#ff7b32']}
@@ -267,15 +305,25 @@ export default function CustomerHome() {
         <View style={styles.qrCard}>
           <Text style={styles.qrTitle}>Your QR Code</Text>
           <Text style={styles.qrSub}>Show to staff to earn stamps</Text>
-          <View style={styles.qrFrame}>
-            <QRCode
-              value={phone || ''}
-              size={220}
-              backgroundColor="white"
-              color="#1f1715"
-            />
-          </View>
-          <Text style={styles.qrCaption}>SHOW TO STAFF</Text>
+          {phone ? (
+            <>
+              <View style={styles.qrFrame} accessibilityLabel="Your loyalty QR code. Show this to staff when making a purchase." accessibilityRole="image">
+                <QRCode
+                  value={phone}
+                  size={220}
+                  backgroundColor="white"
+                  color="#1f1715"
+                />
+              </View>
+              <Text style={styles.qrCaption}>SHOW TO STAFF</Text>
+            </>
+          ) : (
+            <View style={styles.qrFrame}>
+              <Text style={{ color: 'rgba(31,23,21,0.5)', fontSize: 15, fontWeight: '600', textAlign: 'center', paddingVertical: 40 }}>
+                Sign in to see your QR code
+              </Text>
+            </View>
+          )}
         </View>
 
         {/* ── Sign Out ─────────────────────────────────────────────────── */}
@@ -514,4 +562,20 @@ const styles = StyleSheet.create({
   },
 
   btnDisabled: { opacity: 0.5 },
+
+  // ── Offline banner
+  offlineBanner: {
+    backgroundColor: '#ff7b32',
+    borderRadius: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    marginTop: 12,
+    marginBottom: 4,
+    alignItems: 'center',
+  },
+  offlineBannerText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 13,
+  },
 });

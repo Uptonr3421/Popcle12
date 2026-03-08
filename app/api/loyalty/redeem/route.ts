@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     // Look up user by phone
     const { data: user, error: userError } = await supabaseAdmin
       .from('users')
-      .select('id, phone, name, stamp_count')
+      .select('id')
       .eq('phone', phone)
       .single();
 
@@ -20,44 +20,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Check stamp count
-    if (user.stamp_count < 10) {
-      const needed = 10 - user.stamp_count;
-      return NextResponse.json(
-        { error: `Need ${needed} more stamp${needed === 1 ? '' : 's'} to redeem` },
-        { status: 400 }
-      );
-    }
+    // Atomic redemption via Supabase RPC — prevents double redeem race conditions
+    const { data: rpcResult, error: rpcError } = await supabaseAdmin.rpc('redeem_reward', {
+      p_user_id: user.id,
+    });
 
-    // Reset stamp count to 0
-    const { error: updateError } = await supabaseAdmin
-      .from('users')
-      .update({ stamp_count: 0 })
-      .eq('id', user.id);
-
-    if (updateError) {
-      console.error('Failed to reset stamp count:', updateError);
+    if (rpcError) {
+      console.error('Redeem RPC error:', rpcError);
       return NextResponse.json({ error: 'Failed to process redemption' }, { status: 500 });
     }
 
-    // Insert loyalty record
-    const { error: recordError } = await supabaseAdmin
-      .from('loyalty_records')
-      .insert({
-        user_id: user.id,
-        customer_id: user.id,
-        action: 'reward_claimed',
-        stamp_added_at: new Date().toISOString(),
-      });
-
-    if (recordError) {
-      console.error('Failed to insert loyalty record:', recordError);
-      return NextResponse.json({ error: 'Failed to record redemption' }, { status: 500 });
+    if (!rpcResult.success) {
+      return NextResponse.json({ error: rpcResult.error }, { status: 400 });
     }
 
     return NextResponse.json({
       success: true,
-      message: 'Free item claimed! Enjoy your reward!',
+      message: rpcResult.message || 'Free item claimed! Enjoy your reward!',
     });
   } catch (err) {
     console.error('Redeem error:', err);

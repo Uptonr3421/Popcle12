@@ -1,16 +1,28 @@
 import { supabase, supabaseAdmin } from '@/lib/supabase';
 import { NextRequest, NextResponse } from 'next/server';
+import { sanitizePhone, sanitizeString, checkRateLimit } from '@/lib/api-helpers';
 
 export async function POST(request: NextRequest) {
   try {
-    const { phone, name, isEmployee, supabaseVerified } = await request.json();
+    const { phone: rawPhone, name: rawName, isEmployee, supabaseVerified } = await request.json();
 
-    if (!phone || phone.length !== 10) {
+    const phone = sanitizePhone(rawPhone);
+    if (!phone) {
       return NextResponse.json({ error: 'Invalid phone number' }, { status: 400 });
     }
 
-    if (!name || name.trim().length === 0) {
+    const name = sanitizeString(rawName, 100);
+    if (!name) {
       return NextResponse.json({ error: 'Name is required' }, { status: 400 });
+    }
+
+    // Rate limit: 5 registrations per phone per hour
+    const rateCheck = checkRateLimit(`register:${phone}`, 5, 60 * 60 * 1000);
+    if (!rateCheck.allowed) {
+      return NextResponse.json(
+        { error: 'Too many registration attempts. Try again later.', retryAfter: rateCheck.retryAfter },
+        { status: 429 }
+      );
     }
 
     // Check if user already exists

@@ -1,8 +1,14 @@
 import { supabaseAdmin as supabase } from '@/lib/supabase';
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyAdmin, sanitizeString } from '@/lib/api-helpers';
 
 export async function POST(req: NextRequest) {
   try {
+    const { isAdmin, error: authError } = await verifyAdmin(req);
+    if (!isAdmin) {
+      return NextResponse.json({ error: authError || 'Unauthorized' }, { status: 403 });
+    }
+
     // SQL migration required for geofence fields:
     // ALTER TABLE offers
     // ADD COLUMN IF NOT EXISTS lat float8,
@@ -17,17 +23,34 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Input validation
+    const cleanTitle = sanitizeString(title, 200);
+    const cleanDescription = sanitizeString(description, 1000);
+    if (!cleanTitle) {
+      return NextResponse.json({ error: 'Invalid title' }, { status: 400 });
+    }
+    if (typeof lat === 'number' && (lat < -90 || lat > 90)) {
+      return NextResponse.json({ error: 'Latitude must be between -90 and 90' }, { status: 400 });
+    }
+    if (typeof lng === 'number' && (lng < -180 || lng > 180)) {
+      return NextResponse.json({ error: 'Longitude must be between -180 and 180' }, { status: 400 });
+    }
+
     // Parse discount - extract percentage if it's like "50% Off"
     const discountMatch = discount.match(/(\d+)/);
     const discountPercentage = discountMatch ? parseInt(discountMatch[1]) : null;
     const isFreeItem = discount.toLowerCase().includes('free');
 
+    if (discountPercentage !== null && (discountPercentage < 0 || discountPercentage > 100)) {
+      return NextResponse.json({ error: 'Discount percentage must be between 0 and 100' }, { status: 400 });
+    }
+
     const { data: offer, error } = await supabase
       .from('offers')
       .insert([
         {
-          title,
-          description,
+          title: cleanTitle,
+          description: cleanDescription,
           discount_percentage: discountPercentage,
           free_item: isFreeItem,
           expires_at: expiresAt,

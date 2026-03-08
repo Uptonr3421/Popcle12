@@ -6,6 +6,52 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const GEOFENCE_TASK_NAME = 'POPCLE_GEOFENCE_TASK';
 
+const GEOFENCE_ERRORS_KEY = '@popcle_geofence_errors';
+const FAILED_PUSHES_KEY = '@popcle_failed_pushes';
+const MAX_STORED_ERRORS = 10;
+
+async function logGeofenceError(errorMsg: string): Promise<void> {
+  try {
+    const existing = await AsyncStorage.getItem(GEOFENCE_ERRORS_KEY);
+    const errors: Array<{ message: string; timestamp: string }> = existing ? JSON.parse(existing) : [];
+    errors.push({ message: errorMsg, timestamp: new Date().toISOString() });
+    // Keep only last 10 errors
+    const trimmed = errors.slice(-MAX_STORED_ERRORS);
+    await AsyncStorage.setItem(GEOFENCE_ERRORS_KEY, JSON.stringify(trimmed));
+  } catch {
+    // Storage itself failed — nothing we can do
+  }
+}
+
+async function storeFailedPush(pushData: Record<string, unknown>): Promise<void> {
+  try {
+    const existing = await AsyncStorage.getItem(FAILED_PUSHES_KEY);
+    const failed: Array<Record<string, unknown>> = existing ? JSON.parse(existing) : [];
+    failed.push({ ...pushData, failedAt: new Date().toISOString() });
+    const trimmed = failed.slice(-MAX_STORED_ERRORS);
+    await AsyncStorage.setItem(FAILED_PUSHES_KEY, JSON.stringify(trimmed));
+  } catch {
+    // Storage itself failed — nothing we can do
+  }
+}
+
+export async function getFailedPushes(): Promise<Array<Record<string, unknown>>> {
+  try {
+    const val = await AsyncStorage.getItem(FAILED_PUSHES_KEY);
+    return val ? JSON.parse(val) : [];
+  } catch {
+    return [];
+  }
+}
+
+export async function clearFailedPushes(): Promise<void> {
+  try {
+    await AsyncStorage.removeItem(FAILED_PUSHES_KEY);
+  } catch {
+    // ignore
+  }
+}
+
 interface GeofenceOffer {
   id: string;
   title: string;
@@ -19,7 +65,7 @@ interface GeofenceOffer {
 // Must be defined at module level (not inside a component).
 TaskManager.defineTask(GEOFENCE_TASK_NAME, async ({ data, error }: any) => {
   if (error) {
-    console.error('Geofence task error:', error.message);
+    await logGeofenceError(`Task error: ${error.message ?? 'Unknown error'}`);
     return;
   }
   if (!data) return;
@@ -59,19 +105,24 @@ TaskManager.defineTask(GEOFENCE_TASK_NAME, async ({ data, error }: any) => {
         : 'Special Deal');
 
     // Send push via Supabase Edge Function
-    await fetch(`${supabaseUrl}/functions/v1/send-push`, {
+    const pushPayload = {
+      token,
+      title: `🍦 ${discountLabel} — Pop Culture CLE`,
+      body: offer.description || `${offer.title} is available near you!`,
+      data: { screen: 'offers', offerId: offer.id },
+    };
+    const pushRes = await fetch(`${supabaseUrl}/functions/v1/send-push`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${supabaseKey}`,
       },
-      body: JSON.stringify({
-        token,
-        title: `🍦 ${discountLabel} — Pop Culture CLE`,
-        body: offer.description || `${offer.title} is available near you!`,
-        data: { screen: 'offers', offerId: offer.id },
-      }),
+      body: JSON.stringify(pushPayload),
     });
+    if (!pushRes.ok) {
+      await storeFailedPush(pushPayload);
+      await logGeofenceError(`Push delivery failed: HTTP ${pushRes.status}`);
+    }
 
     // Log the geofence event to Supabase for analytics
     const userId = await AsyncStorage.getItem('@popcle_user_id');
@@ -93,7 +144,8 @@ TaskManager.defineTask(GEOFENCE_TASK_NAME, async ({ data, error }: any) => {
       });
     }
   } catch (err) {
-    console.error('Geofence push delivery error:', err);
+    const msg = err instanceof Error ? err.message : 'Unknown geofence push error';
+    await logGeofenceError(msg);
   }
 });
 
@@ -138,7 +190,8 @@ export async function startGeofenceMonitoring() {
     await Location.startGeofencingAsync(GEOFENCE_TASK_NAME, regions);
     console.log('Geofencing started for:', regions.map(r => r.identifier).join(', '));
   } catch (err) {
-    console.error('Failed to start geofencing:', err);
+    const msg = err instanceof Error ? err.message : 'Unknown geofence start error';
+    await logGeofenceError(msg);
   }
 }
 

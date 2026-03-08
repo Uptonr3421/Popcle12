@@ -1,8 +1,14 @@
 import { supabaseAdmin as supabase } from '@/lib/supabase';
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyAdmin } from '@/lib/api-helpers';
 
 export async function GET(req: NextRequest) {
   try {
+    const { isAdmin, error: authError } = await verifyAdmin(req);
+    if (!isAdmin) {
+      return NextResponse.json({ error: authError || 'Unauthorized' }, { status: 403 });
+    }
+
     // Get stats
     const { data: users, error: usersError } = await supabase
       .from('users')

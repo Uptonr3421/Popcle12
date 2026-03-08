@@ -43,12 +43,12 @@ export default function CustomersScreen() {
       {customers.map((c) => {
         const stampStyle = c.stamp_count >= 10 ? styles.stampHigh : c.stamp_count >= 5 ? styles.stampMid : styles.stampLow;
         return (
-          <View key={c.id} style={styles.row}>
+          <View key={c.id} style={styles.row} accessibilityLabel={`${c.name || 'Unknown'}, ${c.stamp_count} stamps`}>
             <View style={styles.rowInfo}>
               <Text style={styles.rowName}>{c.name || 'Unknown'}</Text>
               <Text style={styles.rowPhone}>{c.phone}</Text>
               {c.stamp_count >= 10 && (
-                <View style={styles.readyBadge}>
+                <View style={styles.readyBadge} accessibilityRole="alert">
                   <Text style={styles.readyText}>READY TO REDEEM</Text>
                 </View>
               )}

@@ -14,34 +14,47 @@ export default function AdminOverview() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   useEffect(() => { fetchStats(); }, []);
 
   const fetchStats = async () => {
-    const [usersRes, recordsRes, offersRes] = await Promise.all([
-      supabase.from('users').select('stamp_count').eq('user_type', 'customer'),
-      supabase.from('loyalty_records').select('action, stamp_added_at'),
-      supabase.from('offers').select('id').eq('active', true),
-    ]);
+    try {
+      const [usersRes, recordsRes, offersRes] = await Promise.all([
+        supabase.from('users').select('stamp_count').eq('user_type', 'customer'),
+        supabase.from('loyalty_records').select('action, stamp_added_at'),
+        supabase.from('offers').select('id').eq('active', true),
+      ]);
 
-    const users = usersRes.data || [];
-    const records = recordsRes.data || [];
-    const offers = offersRes.data || [];
+      if (usersRes.error) throw new Error(`Users: ${usersRes.error.message}`);
+      if (recordsRes.error) throw new Error(`Records: ${recordsRes.error.message}`);
+      if (offersRes.error) throw new Error(`Offers: ${offersRes.error.message}`);
 
-    const today = new Date().toISOString().split('T')[0];
-    const stampsToday = records.filter(r =>
-      r.action === 'stamp_added' && r.stamp_added_at?.startsWith(today)
-    ).length;
+      const users = usersRes.data ?? [];
+      const records = recordsRes.data ?? [];
+      const offers = offersRes.data ?? [];
 
-    setStats({
-      totalCustomers: users.length,
-      totalStamps: users.reduce((s, u) => s + (u.stamp_count || 0), 0),
-      rewardsRedeemed: records.filter(r => r.action === 'reward_claimed').length,
-      activeOffers: offers.length,
-      stampsToday,
-    });
-    setLoading(false);
-    setRefreshing(false);
+      const today = new Date().toISOString().split('T')[0];
+      const stampsToday = records.filter(r =>
+        r.action === 'stamp_added' && r.stamp_added_at?.startsWith(today)
+      ).length;
+
+      setStats({
+        totalCustomers: users.length ?? 0,
+        totalStamps: users.reduce((s, u) => s + (u.stamp_count ?? 0), 0),
+        rewardsRedeemed: records.filter(r => r.action === 'reward_claimed').length ?? 0,
+        activeOffers: offers.length ?? 0,
+        stampsToday: stampsToday ?? 0,
+      });
+      setFetchError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Unable to load stats';
+      setFetchError(message);
+      console.error('Admin stats fetch error:', err);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
   };
 
   const onRefresh = () => { setRefreshing(true); fetchStats(); };
@@ -63,7 +76,7 @@ export default function AdminOverview() {
     <ScrollView
       style={styles.container}
       contentContainerStyle={styles.content}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#46bbff" />}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#46bbff" accessibilityLabel="Pull down to refresh statistics" />}
     >
       <View style={styles.header}>
         <View>
@@ -77,9 +90,23 @@ export default function AdminOverview() {
 
       <Text style={styles.sectionTitle}>Overview</Text>
 
+      {fetchError && (
+        <View style={{ backgroundColor: 'rgba(224,32,32,0.12)', borderRadius: 12, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: 'rgba(224,32,32,0.3)' }}>
+          <Text style={{ color: '#ff6b6b', fontWeight: '700', fontSize: 14, marginBottom: 8 }}>
+            Failed to load stats. Please check your connection.
+          </Text>
+          <TouchableOpacity
+            style={{ backgroundColor: 'rgba(70,187,255,0.15)', borderRadius: 8, paddingVertical: 10, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(70,187,255,0.4)' }}
+            onPress={() => { setLoading(true); setFetchError(null); fetchStats(); }}
+          >
+            <Text style={{ color: '#46bbff', fontWeight: '800', fontSize: 14 }}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       <View style={styles.metricsGrid}>
         {metrics.map((m) => (
-          <View key={m.label} style={styles.metricCard}>
+          <View key={m.label} style={styles.metricCard} accessibilityLabel={`${m.label}: ${m.value}`} accessibilityRole="text">
             <Text style={[styles.metricValue, { color: m.color }]}>{m.value}</Text>
             <Text style={styles.metricLabel}>{m.label}</Text>
             <Text style={styles.metricSub}>{m.sub}</Text>

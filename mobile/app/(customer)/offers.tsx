@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
 import {
-  View, Text, ScrollView, StyleSheet, ActivityIndicator,
+  View, Text, ScrollView, StyleSheet,
 } from 'react-native';
 import { getActiveDeals, formatCountdown, ActiveDeal } from '@/lib/deals';
+import { cacheOffers, getCachedOffers } from '@/lib/cache';
+import OffersSkeleton from '@/components/OffersSkeleton';
 
 export default function OffersScreen() {
   const [deals, setDeals] = useState<ActiveDeal[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isOffline, setIsOffline] = useState(false);
   const [tick, setTick] = useState(0);
 
   useEffect(() => {
@@ -20,23 +23,30 @@ export default function OffersScreen() {
 
   const fetchOffers = async () => {
     setLoading(true);
-    const active = await getActiveDeals();
-    setDeals(active);
+    try {
+      const active = await getActiveDeals();
+      setDeals(active);
+      setIsOffline(false);
+      cacheOffers(active);
+    } catch (err) {
+      console.warn('Failed to fetch offers, trying cache:', err);
+      const cached = await getCachedOffers();
+      setDeals(cached as ActiveDeal[]);
+      setIsOffline(true);
+    }
     setLoading(false);
   };
 
-  // Recompute seconds left on each tick
-  const dealsWithCountdown = deals.map(d => ({
-    ...d,
-    secondsLeft: Math.max(0, Math.floor((new Date(d.expiresAt).getTime() - Date.now()) / 1000)),
-  }));
+  // Recompute seconds left on each tick, filter out expired deals
+  const dealsWithCountdown = deals
+    .map(d => ({
+      ...d,
+      secondsLeft: Math.max(0, Math.floor((new Date(d.expiresAt).getTime() - Date.now()) / 1000)),
+    }))
+    .filter(d => d.secondsLeft > 0);
 
   if (loading) {
-    return (
-      <View style={styles.loading}>
-        <ActivityIndicator size="large" color="#ff3b8d" />
-      </View>
-    );
+    return <OffersSkeleton />;
   }
 
   return (
@@ -44,6 +54,10 @@ export default function OffersScreen() {
       <View style={styles.content}>
         <Text style={styles.title}>Special Offers</Text>
         <Text style={styles.subtitle}>Exclusive deals for loyal customers</Text>
+
+        {isOffline && (
+          <Text style={styles.offlineText} accessibilityRole="alert">Offline — showing last known deals</Text>
+        )}
 
         {dealsWithCountdown.length === 0 ? (
           <View style={styles.empty}>
@@ -53,7 +67,7 @@ export default function OffersScreen() {
           </View>
         ) : (
           dealsWithCountdown.map((d) => (
-            <View key={d.id} style={styles.offerCard}>
+            <View key={d.id} style={styles.offerCard} accessibilityLabel={`${d.title}: ${d.description}. ${d.secondsLeft > 0 ? 'Expires in ' + formatCountdown(d.secondsLeft) : 'Expired'}`}>
               <Text style={styles.offerDiscount}>{d.discountLabel}</Text>
               <Text style={styles.offerTitle}>{d.title}</Text>
               <Text style={styles.offerDesc}>{d.description}</Text>
@@ -154,4 +168,13 @@ const styles = StyleSheet.create({
   countdownLabel: { fontSize: 10, fontWeight: '700', color: 'rgba(31,23,21,0.4)', letterSpacing: 2, textTransform: 'uppercase' },
   countdown: { fontSize: 16, fontWeight: '800', color: '#ff3b8d', fontVariant: ['tabular-nums'] },
   countdownUrgent: { color: '#ff3b8d' },
+
+  // ── Offline indicator
+  offlineText: {
+    textAlign: 'center',
+    color: '#ff7b32',
+    fontWeight: '700',
+    fontSize: 13,
+    marginBottom: 16,
+  },
 });

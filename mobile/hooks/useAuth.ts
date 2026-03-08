@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { AppState } from 'react-native';
 import { supabase } from '@/lib/supabase';
 import type { Session } from '@supabase/supabase-js';
 
@@ -32,7 +33,22 @@ export function useAuth(): AuthState {
       }
     });
 
-    return () => subscription.unsubscribe();
+    // Refresh session when app comes back to foreground
+    const appStateSubscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          setSession(session);
+          if (session) fetchUserData(session.user.id, session.user.phone);
+        }).catch(() => {
+          // Session refresh failed (offline) — keep current state
+        });
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+      appStateSubscription.remove();
+    };
   }, []);
 
   async function fetchUserData(userId: string, userPhone: string | undefined) {
