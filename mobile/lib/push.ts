@@ -9,6 +9,8 @@ Notifications.setNotificationHandler({
     shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: false,
+    shouldShowBanner: true,
+    shouldShowList: true,
   }),
 });
 
@@ -37,7 +39,7 @@ export async function registerPushToken(userId: string): Promise<string | null> 
 
   try {
     const tokenData = await Notifications.getExpoPushTokenAsync({
-      projectId: 'YOUR_EAS_PROJECT_ID', // Replace with EAS project ID after eas init
+      projectId: 'c2cc0ff0-b545-4904-bc0c-8e8f24af76ff',
     });
     const token = tokenData.data;
 

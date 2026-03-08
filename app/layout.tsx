@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { Sora, Manrope } from 'next/font/google'
-import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
 const sora = Sora({ weight: ['400', '600', '700', '800'], subsets: ['latin'], variable: '--font-sora' })
@@ -47,7 +46,6 @@ export default function RootLayout({
     <html lang="en" className="bg-background">
       <body className={`font-sans antialiased ${sora.variable} ${manrope.variable}`}>
         {children}
-        <Analytics />
       </body>
     </html>
   )

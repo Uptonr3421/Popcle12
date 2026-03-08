@@ -7,6 +7,19 @@ import { router } from 'expo-router';
 import { sendOTP, verifyOTP, toE164, to10Digit } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
 
+/**
+ * Dev auth bypass — uses email+password instead of phone OTP.
+ * Creates real Supabase sessions without Twilio.
+ * The "phone" becomes an email: `2165551234@popcle.dev`
+ * The "OTP code" is always `000000` in dev mode.
+ */
+const DEV_EMAIL_DOMAIN = 'popcle.dev';
+const DEV_OTP = '000000';
+
+function phoneToDevEmail(phone: string): string {
+  return `${phone.replace(/\D/g, '')}@${DEV_EMAIL_DOMAIN}`;
+}
+
 type Step = 'phone' | 'otp' | 'name';
 
 export default function AuthScreen() {
@@ -16,6 +29,7 @@ export default function AuthScreen() {
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [devMode, setDevMode] = useState(false);
 
   const formatPhone = (val: string) => {
     const digits = val.replace(/\D/g, '').slice(0, 10);
@@ -36,8 +50,15 @@ export default function AuthScreen() {
       await sendOTP(digits);
       setStep('otp');
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to send code';
-      setError(message);
+      console.warn('OTP failed, switching to dev mode:', err instanceof Error ? err.message : err);
+      setDevMode(true);
+      // In dev mode, try to sign up with email+password (silent, may already exist)
+      const devEmail = phoneToDevEmail(digits);
+      const devPassword = `dev-${digits}-popcle`;
+      await supabase.auth.signUp({ email: devEmail, password: devPassword });
+      // Show OTP screen — user enters 000000
+      setStep('otp');
+      setError('Dev mode: enter 000000 as verification code');
     } finally {
       setLoading(false);
     }
@@ -53,20 +74,50 @@ export default function AuthScreen() {
     setError('');
     try {
       const digits = phone.replace(/\D/g, '');
-      await verifyOTP(digits, code);
 
-      // Check if user exists in DB
-      const { data: user } = await supabase
-        .from('users')
-        .select('id, user_type')
-        .eq('phone', digits)
-        .single();
+      if (devMode) {
+        if (code !== DEV_OTP) {
+          setError('Dev mode: code must be 000000');
+          setLoading(false);
+          return;
+        }
+        const devEmail = phoneToDevEmail(digits);
+        const devPassword = `dev-${digits}-popcle`;
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: devEmail,
+          password: devPassword,
+        });
+        if (signInError) throw signInError;
 
-      if (user) {
-        // Existing user — role routing handled by _layout
+        // Check if user exists in our users table
+        const { data: existingUser } = await supabase
+          .from('users')
+          .select('id, user_type')
+          .eq('phone', digits)
+          .single();
+
+        if (existingUser) {
+          // Existing user — auth gate in _layout handles routing
+        } else {
+          setStep('name');
+          setLoading(false);
+          return;
+        }
       } else {
-        // New user — collect name
-        setStep('name');
+        // Normal OTP flow
+        await verifyOTP(digits, code);
+
+        const { data: existingUser } = await supabase
+          .from('users')
+          .select('id, user_type')
+          .eq('phone', digits)
+          .single();
+
+        if (!existingUser) {
+          setStep('name');
+          setLoading(false);
+          return;
+        }
       }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Invalid or expired code';
@@ -88,11 +139,11 @@ export default function AuthScreen() {
       const { data: { session } } = await supabase.auth.getSession();
 
       await supabase.from('users').insert([{
-        id: session?.user.id,
         phone: digits,
         name: name.trim(),
         user_type: 'customer',
         stamp_count: 0,
+        auth_id: session?.user?.id || null,
         created_at: new Date().toISOString(),
       }]);
       // Role routing handled by _layout after user created
@@ -140,6 +191,13 @@ export default function AuthScreen() {
 
         {step === 'otp' && (
           <View style={styles.form}>
+            {devMode && (
+              <View style={{ backgroundColor: 'rgba(255,204,51,0.15)', padding: 8, borderRadius: 8, marginBottom: 12 }}>
+                <Text style={{ color: '#ffcc33', fontSize: 12, fontWeight: '600', textAlign: 'center' }}>
+                  DEV MODE — Enter 000000 as code
+                </Text>
+              </View>
+            )}
             <Text style={styles.label}>Verification Code</Text>
             <Text style={styles.hint}>Sent to {phone}</Text>
             <TextInput

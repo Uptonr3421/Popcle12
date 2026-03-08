@@ -7,7 +7,7 @@ interface RevealProps {
   className?: string;
   variant?: "reveal" | "reveal-left" | "reveal-right" | "reveal-scale";
   delay?: 0 | 1 | 2 | 3 | 4 | 5;
-  as?: keyof JSX.IntrinsicElements;
+  as?: keyof React.JSX.IntrinsicElements;
 }
 
 export default function Reveal({

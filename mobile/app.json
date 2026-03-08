@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Pop Culture CLE",
-    "slug": "popculturecle-loyalty",
+    "slug": "popcle-loyalty",
     "scheme": "popculturecle",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -26,7 +26,18 @@
         "backgroundColor": "#0f0a1a"
       },
       "package": "io.alignment_ai.popculturecle",
-      "permissions": ["ACCESS_BACKGROUND_LOCATION", "ACCESS_FINE_LOCATION", "CAMERA"]
+      "permissions": [
+        "ACCESS_BACKGROUND_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "CAMERA",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_BACKGROUND_LOCATION",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_LOCATION",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "plugins": [
       [
@@ -51,6 +62,15 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "root": "app"
+      },
+      "eas": {
+        "projectId": "c2cc0ff0-b545-4904-bc0c-8e8f24af76ff"
+      }
+    },
+    "owner": "urand"
   }
 }
