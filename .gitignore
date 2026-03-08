@@ -62,3 +62,7 @@ __v0_jsx-dev-runtime.ts
 # ── Agent context files — ALWAYS COMMIT, never ignore ────────
 # CLAUDE.md, GEMINI.md, AGENTS.md are intentionally tracked.
 # DO NOT add them to this file.
+
+# ── Claude Code — local secrets file (NEVER COMMIT) ─────────
+.claude/settings.local.json
+

@@ -1,0 +1,124 @@
+{
+  "model": "claude-opus-4-5",
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Bash(git:*)", "Bash(gh:*)", "Bash(node:*)", "Bash(npx:*)",
+      "Bash(npm:*)", "Bash(pnpm:*)", "Bash(bun:*)", "Bash(expo:*)",
+      "Bash(eas:*)", "Bash(tsc:*)", "Bash(eslint:*)", "Bash(jest:*)",
+      "Bash(detox:*)", "Bash(vercel:*)", "Bash(supabase:*)",
+      "Bash(python:*)", "Bash(python3:*)", "Bash(pip:*)",
+      "Bash(pwsh:*)", "Bash(powershell:*)",
+      "Bash(ls:*)", "Bash(dir:*)", "Bash(cat:*)", "Bash(find:*)",
+      "Bash(grep:*)", "Bash(cp:*)", "Bash(mv:*)", "Bash(rm:*)",
+      "Bash(mkdir:*)", "Bash(touch:*)", "Bash(echo:*)",
+      "Bash(curl:*)", "Bash(wget:*)", "Bash(tree:*)",
+      "Bash(du:*)", "Bash(chmod:*)", "Bash(unzip:*)", "Bash(tar:*)",
+      "Bash(file:*)", "Bash(xargs:*)",
+      "WebSearch",
+      "WebFetch(domain:docs.expo.dev)",
+      "WebFetch(domain:supabase.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "WebFetch(domain:vercel.com)",
+      "WebFetch(domain:reactnative.dev)",
+      "WebFetch(domain:npmjs.com)",
+      "WebFetch(domain:developer.apple.com)",
+      "WebFetch(domain:developer.android.com)",
+      "WebFetch(domain:help.figma.com)",
+      "WebFetch(domain:linear.app)",
+      "WebFetch(domain:airtable.com)",
+      "WebFetch(domain:wix.github.io)",
+      "WebFetch(domain:context7.com)",
+      "WebFetch(domain:nativewind.dev)",
+      "Read(C:\\Alignment-AI\\**)",
+      "Read(C:\\Users\\conta\\**)",
+      "Write(C:\\Alignment-AI\\projects\\popculturecle-loyalty\\**)"
+    ],
+    "deny": [
+      "Write(C:\\Alignment-AI\\projects\\popculturecle-loyalty\\.env.local)",
+      "Write(C:\\Alignment-AI\\projects\\popculturecle-loyalty\\.gitignore)",
+      "Write(C:\\Alignment-AI\\projects\\popculturecle-loyalty\\CLAUDE.md)",
+      "Write(C:\\Alignment-AI\\projects\\popculturecle-loyalty\\GEMINI.md)",
+      "Write(C:\\Alignment-AI\\projects\\popculturecle-loyalty\\AGENTS.md)"
+    ]
+  },
+  "mcpServers": {
+    "desktop-commander": {
+      "command": "node",
+      "args": ["C:\\Users\\conta\\AppData\\Roaming\\npm\\node_modules\\@wonderwhy-er\\desktop-commander\\dist\\index.js"]
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem",
+        "C:\\Alignment-AI\\projects\\popculturecle-loyalty",
+        "C:\\Alignment-AI"
+      ]
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": "$GITHUB_TOKEN" }
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+      "env": { "BRAVE_API_KEY": "$BRAVE_API_KEY" }
+    },
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"]
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"],
+      "env": { "CONTEXT7_API_KEY": "$CONTEXT7_API_KEY" }
+    },
+    "fetch": {
+      "command": "uvx",
+      "args": ["mcp-server-fetch"]
+    },
+    "supabase": {
+      "command": "npx",
+      "args": ["-y", "@supabase/mcp-server-supabase",
+        "--supabase-url", "https://hebmjzgooluebakqaxly.supabase.co",
+        "--supabase-key", "$SUPABASE_SERVICE_ROLE_KEY"
+      ]
+    },
+    "vercel": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://mcp.vercel.com"],
+      "env": { "VERCEL_TOKEN": "$VERCEL_TOKEN" }
+    },
+    "airtable": {
+      "command": "npx",
+      "args": ["-y", "airtable-mcp-server"],
+      "env": {
+        "AIRTABLE_API_KEY": "$AIRTABLE_API_KEY",
+        "AIRTABLE_BASE_ID": "appFgnBcFdhaYRHv9"
+      }
+    },
+    "postman": {
+      "command": "npx",
+      "args": ["-y", "@postman/postman-mcp-server"],
+      "env": { "POSTMAN_API_KEY": "$POSTMAN_API_KEY" }
+    },
+    "linear": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://mcp.linear.app/sse"],
+      "env": { "LINEAR_API_KEY": "$LINEAR_API_KEY" }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"]
+    },
+    "git": {
+      "command": "uvx",
+      "args": ["mcp-server-git", "-r", "C:\\Alignment-AI\\projects\\popculturecle-loyalty"]
+    }
+  }
+}
