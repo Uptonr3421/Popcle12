@@ -1,10 +1,64 @@
-# v0 runtime files
+# ── Dependencies ─────────────────────────────────────────────
+node_modules/
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# ── Next.js build output ─────────────────────────────────────
+/.next/
+/out/
+/build
+
+# ── Environment & Secrets — NEVER COMMIT ────────────────────
+.env
+.env.*
+*.env
+*.env.local
+*.env.development
+*.env.production
+*.env.staging
+*.env.test
+.env*.local
+supabase.env.txt
+credentials.json
+*secret*
+*_secret*
+
+# ── Exception: safe template file ───────────────────────────
+!.env.example
+
+# ── Vercel ───────────────────────────────────────────────────
+.vercel
+
+# ── TypeScript ───────────────────────────────────────────────
+*.tsbuildinfo
+next-env.d.ts
+
+# ── Misc artifacts ───────────────────────────────────────────
+.DS_Store
+*.pem
+build_log.txt
+deploy_log.txt
+lint-out.txt
+pdf_content.txt
+projects_list.txt
+teams.txt
+*.pdf
+sync.py
+*.py
+
+# ── v0 runtime files ─────────────────────────────────────────
 __v0_runtime_loader.js
 __v0_devtools.tsx
 __v0_jsx-dev-runtime.ts
 
-# Common ignores
-node_modules/
-.next/
-.env*.local
-.DS_Store
+# ── Snapshots (local dev only) ───────────────────────────────
+.snapshots/
+
+# ── Agent context files — ALWAYS COMMIT, never ignore ────────
+# CLAUDE.md, GEMINI.md, AGENTS.md are intentionally tracked.
+# DO NOT add them to this file.
